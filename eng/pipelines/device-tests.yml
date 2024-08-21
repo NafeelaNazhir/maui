@@ -81,11 +81,8 @@ parameters:
   - name: catalystPool
     type: object
     default:
-      name: $(androidTestsVmPool)
-      vmImage: $(androidTestsVmImage)
-      demands:
-        - macOS.Name -equals Sonoma
-        - macOS.Architecture -equals x64
+      name: $(macosTestsVmPool)
+      vmImage: $(macosTestsVmImage)
 
   - name: windowsPool
     type: object
