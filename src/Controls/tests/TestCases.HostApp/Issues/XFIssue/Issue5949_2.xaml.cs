@@ -8,7 +8,12 @@ public partial class Issue5949_2 : ContentPage
 	public Issue5949_2()
 	{
 		InitializeComponent();
-		ToolbarItems.Add(new ToolbarItem(ToolBarItem, null, () => Navigation.PushAsync(LoginPage())));
+		var toolbarItem = new ToolbarItem();
+		toolbarItem.Text = "Login";
+		toolbarItem.AutomationId = "Login";
+		toolbarItem.Clicked += (s, e) => Navigation.PushAsync(LoginPage());
+		toolbarItem.IconImageSource = "null";
+		ToolbarItems.Add(toolbarItem);
 		BindingContext = new _5949ViewModel();
 	}
 

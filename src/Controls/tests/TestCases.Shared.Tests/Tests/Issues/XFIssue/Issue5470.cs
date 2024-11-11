@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST  //didn't render into the ui
+using NUnit.Framework;
 using UITest.Appium;
 using UITest.Core;
 
@@ -12,12 +13,11 @@ public class Issue5470 : _IssuesUITest
 
 	public override string Issue => "ApplinkEntry Thumbnail required after upgrading to 3.5/3.6";
 
-	//[Test]
-	//[Category(UITestCategories.AppLinks)]
-	//[FailsOnIOS]
-	//public void Issue5470Test()
-	//{
-	//	Thread.Sleep(500); // give it time to crash
-	//	App.WaitForElement(q => q.Marked("IssuePageLabel"));
-	//}
+	[Test]
+	[Category(UITestCategories.AppLinks)]
+	public void Issue5470Test()
+	{
+		App.WaitForElement("IssuePageLabel");
+	}
 }
+#endif 

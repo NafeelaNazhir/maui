@@ -11,16 +11,15 @@ public class Issue45749 : _IssuesUITest
 
 	public override string Issue => "Disable horizontal scroll in the custom listview in android";
 
-	//[Test]
-	//[Category(UITestCategories.ListView)]
-	//[FailsOnMauiIOS]
-	//public void DisableScrollingOnCustomHorizontalListView()
-	//{
-	//	App.WaitForElement("Button");
-	//	App.WaitForElement(q => q.Marked("True"), timeout: TimeSpan.FromSeconds(2));
-	//	App.Screenshot("Custom HorizontalListView Scrolling Enabled Default");
-	//	App.Tap(q => q.Marked("Toggle ScrollView.IsEnabled"));
-	//	App.WaitForElement(q => q.Marked("False"), timeout: TimeSpan.FromSeconds(2));
-	//	App.Screenshot("Custom HorizontalListView Scrolling Disabled");
-	//}
+	[Test]
+	[Category(UITestCategories.ListView)]
+	public void DisableScrollingOnCustomHorizontalListView()
+	{
+		App.WaitForElement("Button");
+		App.WaitForElement("True");
+		App.Screenshot("Custom HorizontalListView Scrolling Enabled Default");
+		App.Tap("Button");
+		App.WaitForElement("False");
+		App.Screenshot("Custom HorizontalListView Scrolling Disabled");
+	}
 }
