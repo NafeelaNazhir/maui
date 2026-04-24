@@ -672,16 +672,50 @@ namespace Microsoft.Maui.TestCases.Tests
 			if (width <= 0 || height <= 0)
 				return bytes;
 
-			// Draw a rounded rectangle with the app window bounds as mask
-			using var surface = new MagickImage(MagickColors.Transparent, (uint)width, (uint)height);
+			using var image = new MagickImage(bytes);
+
+			// Detect display scale factor: GetRect() returns logical points, but
+			// App.Screenshot() returns pixels at the display's native resolution
+			// (2x on Retina). On non-Retina CI VMs (e.g. macOS-14) scale = 1,
+			// on Retina VMs (e.g. macOS 26 Tahoe ACES) scale = 2.
+			int scaleFactor = 1;
+			try
+			{
+				var appBounds = App.FindElement(AppiumQuery.ByXPath("//XCUIElementTypeApplication")).GetRect();
+				if (appBounds.Width > 0)
+				{
+					scaleFactor = (int)Math.Round((double)image.Width / appBounds.Width);
+					if (scaleFactor < 1) scaleFactor = 1;
+				}
+			}
+			catch
+			{
+				// If we can't determine the scale factor, default to 1 (non-Retina)
+			}
+
+			// Scale all coordinates from logical points to pixels
+			int pxX = x * scaleFactor;
+			int pxY = y * scaleFactor;
+			int pxWidth = width * scaleFactor;
+			int pxHeight = height * scaleFactor;
+			int pxCornerRadius = cornerRadius * scaleFactor;
+
+			// Draw a rounded rectangle mask at pixel resolution
+			using var surface = new MagickImage(MagickColors.Transparent, (uint)pxWidth, (uint)pxHeight);
 			new Drawables()
-				.RoundRectangle(0, 0, width, height, cornerRadius, cornerRadius)
+				.RoundRectangle(0, 0, pxWidth, pxHeight, pxCornerRadius, pxCornerRadius)
 				.FillColor(MagickColors.Black)
 				.Draw(surface);
 
-			// Composite the screenshot with the mask
-			using var image = new MagickImage(bytes);
-			surface.Composite(image, -x, -y, CompositeOperator.SrcAtop);
+			// Composite the full-screen screenshot onto the mask, offset to extract the window area
+			surface.Composite(image, -pxX, -pxY, CompositeOperator.SrcAtop);
+
+			// Normalize to logical point dimensions so downstream crop values
+			// (e.g., cropFromTop = 29) remain correct regardless of pixel density
+			if (scaleFactor > 1)
+			{
+				surface.Resize((uint)width, (uint)height);
+			}
 
 			return surface.ToByteArray(MagickFormat.Png);
 		}
