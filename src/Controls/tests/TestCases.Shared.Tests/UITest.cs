@@ -674,47 +674,53 @@ namespace Microsoft.Maui.TestCases.Tests
 
 			using var image = new MagickImage(bytes);
 
-			// Detect display scale factor: GetRect() returns logical points, but
-			// App.Screenshot() returns pixels at the display's native resolution
-			// (2x on Retina). On non-Retina CI VMs (e.g. macOS-14) scale = 1,
-			// on Retina VMs (e.g. macOS 26 Tahoe ACES) scale = 2.
+			// Detect display scale factor: on macOS, XCUITest returns window coordinates
+			// in logical screen points. App.Screenshot() captures at native pixel resolution
+			// (2x on Retina). We check if 2x-scaled window coordinates fit within the
+			// screenshot to determine if we're on a Retina display.
+			// On non-Retina VMs (e.g. macOS-14, 1440×900): scale = 1.
+			// On Retina VMs (e.g. macOS 26 Tahoe ACES, 2880×1800): scale = 2.
 			int scaleFactor = 1;
-			try
+			if (x * 2 + width * 2 <= (int)image.Width &&
+				y * 2 + height * 2 <= (int)image.Height &&
+				(int)image.Width > x + width + width)
 			{
-				var appBounds = App.FindElement(AppiumQuery.ByXPath("//XCUIElementTypeApplication")).GetRect();
-				if (appBounds.Width > 0)
-				{
-					scaleFactor = (int)Math.Round((double)image.Width / appBounds.Width);
-					if (scaleFactor < 1) scaleFactor = 1;
-				}
-			}
-			catch
-			{
-				// If we can't determine the scale factor, default to 1 (non-Retina)
+				scaleFactor = 2;
 			}
 
-			// Scale all coordinates from logical points to pixels
-			int pxX = x * scaleFactor;
-			int pxY = y * scaleFactor;
-			int pxWidth = width * scaleFactor;
-			int pxHeight = height * scaleFactor;
-			int pxCornerRadius = cornerRadius * scaleFactor;
+			// Step 1: Crop the full-screen screenshot to the window area at pixel resolution
+			if (scaleFactor > 1)
+			{
+				image.Crop(new MagickGeometry(x * scaleFactor, y * scaleFactor, (uint)(width * scaleFactor), (uint)(height * scaleFactor)));
+				image.ResetPage();
+				// Step 2: Resize to logical-point dimensions so the rounded corner mask
+				// and downstream crop values match the 1x reference snapshots.
+				// Use IgnoreAspectRatio to guarantee exact target dimensions.
+				var resizeGeo = new MagickGeometry((uint)width, (uint)height);
+				resizeGeo.IgnoreAspectRatio = true;
+				image.Resize(resizeGeo);
+			}
 
-			// Draw a rounded rectangle mask at pixel resolution
-			using var surface = new MagickImage(MagickColors.Transparent, (uint)pxWidth, (uint)pxHeight);
+			// Use actual image dimensions for the mask surface to avoid any mismatch
+			uint surfaceWidth = scaleFactor > 1 ? image.Width : (uint)width;
+			uint surfaceHeight = scaleFactor > 1 ? image.Height : (uint)height;
+
+			// Step 3: Apply rounded corner mask at logical resolution (identical to 1x behavior)
+			using var surface = new MagickImage(MagickColors.Transparent, surfaceWidth, surfaceHeight);
 			new Drawables()
-				.RoundRectangle(0, 0, pxWidth, pxHeight, pxCornerRadius, pxCornerRadius)
+				.RoundRectangle(0, 0, surfaceWidth, surfaceHeight, cornerRadius, cornerRadius)
 				.FillColor(MagickColors.Black)
 				.Draw(surface);
 
-			// Composite the full-screen screenshot onto the mask, offset to extract the window area
-			surface.Composite(image, -pxX, -pxY, CompositeOperator.SrcAtop);
-
-			// Normalize to logical point dimensions so downstream crop values
-			// (e.g., cropFromTop = 29) remain correct regardless of pixel density
 			if (scaleFactor > 1)
 			{
-				surface.Resize((uint)width, (uint)height);
+				// Image was already cropped and resized to logical dims — composite at origin
+				surface.Composite(image, 0, 0, CompositeOperator.SrcAtop);
+			}
+			else
+			{
+				// Original 1x path: composite full screenshot with negative offset
+				surface.Composite(image, -x, -y, CompositeOperator.SrcAtop);
 			}
 
 			return surface.ToByteArray(MagickFormat.Png);
