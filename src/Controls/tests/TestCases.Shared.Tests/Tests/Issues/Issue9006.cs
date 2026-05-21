@@ -10,6 +10,9 @@ namespace Microsoft.Maui.TestCases.Tests.Issues
 #if ANDROID
 		const string Back = "";
 		const string Tab1 = "";
+#elif MACCATALYST
+		const string Back = "Back";
+		const string Tab1 = "BackButton";
 #else
 		const string Back = "Back";
 		const string Tab1 = "Tab 1";
@@ -31,11 +34,7 @@ namespace Microsoft.Maui.TestCases.Tests.Issues
 			App.WaitForElementTillPageNavigationSettled(FinalLabel);
 			App.TapBackArrow(Back);
 			App.WaitForElement("This is the intermediate page");
-#if MACCATALYST
-			App.TapBackArrow("BackButton");
-#else
 			App.TapBackArrow(Tab1);
-#endif
 			App.WaitForElement(ClickMe);
 			App.Tap(ClickMe);
 			App.WaitForElementTillPageNavigationSettled(FinalLabel);
