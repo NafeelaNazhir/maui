@@ -879,15 +879,9 @@ public class ShellNavigationFeatureTests : _GalleryUITest
 		App.Tap("Reset");
 	}
 
-#if TEST_FAILS_ON_CATALYST // Issue Link: https://github.com/dotnet/maui/issues/34771
-	// BackButtonBehavior.IsEnabled=false keeps the back button visible but ignores taps.
 	[Test, Order(50)]
 	public void BackButtonBehavior_IsEnabled_False_BackButtonDoesNotNavigate()
 	{
-		if (iOS26OrHigher)
-		{
-			Assert.Ignore("Fails on iOS 26 due to bug issue: https://github.com/dotnet/maui/issues/34771");
-		}
 		App.WaitForElement("MainPageIdentityLabel");
 		App.WaitForElement("IsEnabledButton");
 		App.Tap("IsEnabledButton");
@@ -905,16 +899,11 @@ public class ShellNavigationFeatureTests : _GalleryUITest
 		App.WaitForElement("MainPageIdentityLabel");
 		App.Tap("Reset");
 	}
-#endif
 
 	// BackButtonBehavior.IsVisible=false hides the back button; programmatic navigation still works.
 	[Test, Order(51)]
 	public void BackButtonBehavior_IsVisible_False_ProgrammaticNavStillWorks()
 	{
-		if (iOS26OrHigher)
-		{
-			Assert.Ignore("Fails on iOS 26 due to bug issue: https://github.com/dotnet/maui/issues/34771");
-		}
 		App.WaitForElement("MainPageIdentityLabel");
 		App.WaitForElement("IsVisibleButton");
 		App.Tap("IsVisibleButton");
@@ -927,10 +916,6 @@ public class ShellNavigationFeatureTests : _GalleryUITest
 	[Test, Order(52)]
 	public void BackButtonBehavior_IconOverride_CustomIconShownOnBackButton()
 	{
-		if (iOS26OrHigher)
-		{
-			NavigateToDetail1AndWait();
-		}
 		App.WaitForElement("Detail1GoBackButton");
 		App.Tap("Detail1GoBackButton");
 		App.WaitForElement("MainPageIdentityLabel");
