@@ -49,12 +49,13 @@ class AppiumAppleStepperActions : ICommandExecutionGroup
 		if (stepper is null)
 			return CommandResponse.FailedEmptyResponse;
 
-		var buttons = AppiumQuery.ByClass("XCUIElementTypeButton").FindElements(stepper, _appiumApp);
+		var buttons = GetOrderedStepperButtons(stepper);
 
 		if (buttons is not null && buttons.Count > 1)
 		{
-			var increaseButton = buttons.LastOrDefault();
-			increaseButton?.Tap();
+			// Increase (+) button is always the rightmost one
+			var increaseButton = buttons[buttons.Count - 1];
+			increaseButton.Tap();
 		}
 
 		return CommandResponse.SuccessEmptyResponse;
@@ -73,15 +74,30 @@ class AppiumAppleStepperActions : ICommandExecutionGroup
 		if (stepper is null)
 			return CommandResponse.FailedEmptyResponse;
 
-		var buttons = AppiumQuery.ByClass("XCUIElementTypeButton").FindElements(stepper, _appiumApp);
+		var buttons = GetOrderedStepperButtons(stepper);
 
 		if (buttons is not null && buttons.Count > 1)
 		{
-			var decreaseButton = buttons.FirstOrDefault();
-			decreaseButton?.Tap();
+			// Decrease (-) button is always the leftmost one
+			var decreaseButton = buttons[0];
+			decreaseButton.Tap();
 		}
 
 		return CommandResponse.SuccessEmptyResponse;
+	}
+
+	// Sorts the stepper's buttons left-to-right by screen position,
+	// since Appium doesn't always return them in a reliable order.
+	List<IUIElement>? GetOrderedStepperButtons(AppiumElement stepper)
+	{
+		var buttons = AppiumQuery.ByClass("XCUIElementTypeButton").FindElements(stepper, _appiumApp);
+
+		if (buttons is null)
+			return null;
+
+		return buttons
+			.OrderBy(b => b.GetRect().X)
+			.ToList();
 	}
 
 	static AppiumElement? GetAppiumElement(object element) =>
