@@ -74,4 +74,25 @@ public partial class ItemsSourceOptionsPage : ContentPage
 			_viewModel.IsGrouped = true;
 		}
 	}
+
+	private void OnItemsLayoutChanged(object sender, CheckedChangedEventArgs e)
+	{
+		if (ItemsLayoutVerticalList.IsChecked)
+		{
+			_viewModel.ItemsLayout = new LinearItemsLayout(ItemsLayoutOrientation.Vertical);
+		}
+		else if (ItemsLayoutHorizontalList.IsChecked)
+		{
+			_viewModel.ItemsLayout = new LinearItemsLayout(ItemsLayoutOrientation.Horizontal);
+		}
+		else if (ItemsLayoutVerticalGrid.IsChecked)
+		{
+			_viewModel.ItemsLayout = new GridItemsLayout(2, ItemsLayoutOrientation.Vertical);
+		}
+		else if (ItemsLayoutHorizontalGrid.IsChecked)
+		{
+			_viewModel.ItemsLayout = new GridItemsLayout(2, ItemsLayoutOrientation.Horizontal);
+		}
+	}
+
 }
