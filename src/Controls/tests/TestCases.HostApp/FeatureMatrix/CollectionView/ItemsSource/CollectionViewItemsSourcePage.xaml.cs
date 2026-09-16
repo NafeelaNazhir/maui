@@ -23,8 +23,7 @@ public partial class CollectionViewItemsSourcePage : ContentPage
 
 	private async void NavigateToOptionsPage_Clicked(object sender, EventArgs e)
 	{
-		BindingContext = _viewModel = new CollectionViewViewModel();
-		_viewModel.PreviousSelectionText = "No previous items";
+		_viewModel.Reset();
 		await Navigation.PushAsync(new ItemsSourceOptionsPage(_viewModel));
 	}
 
@@ -54,6 +53,11 @@ public partial class CollectionViewItemsSourcePage : ContentPage
 		}
 
 		IndexEntry.Text = string.Empty;
+	}
+
+	private void ReplaceItemsSource_Clicked(object sender, EventArgs e)
+	{
+		_viewModel.ReplaceItemsSource();
 	}
 
 	void OnCollectionViewSelectionChanged(object sender, SelectionChangedEventArgs e)
