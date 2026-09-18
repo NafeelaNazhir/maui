@@ -95,6 +95,10 @@ public class Issue35826 : _IssuesUITest
 		OpenChildActivityAndRequirePhotoPicker();
 
 		App.Tap(ChildActivityFinishWhilePickingButton);
+		App.WaitForNoElement(
+			ChildActivityFinishWhilePickingButton,
+			"Timed out waiting for the launching activity to finish.",
+			timeout: TimeSpan.FromSeconds(3));
 		App.Back();
 
 		App.WaitForElement(StatusLabel);
