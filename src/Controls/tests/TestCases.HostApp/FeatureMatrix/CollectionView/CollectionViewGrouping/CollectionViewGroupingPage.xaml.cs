@@ -18,7 +18,7 @@ public partial class CollectionViewGroupingPage : ContentPage
 
 	private async void NavigateToOptionsPage_Clicked(object sender, EventArgs e)
 	{
-		BindingContext = _viewModel = new CollectionViewViewModel();
+		_viewModel.Reset();
 		_viewModel.ItemsSourceType = ItemsSourceType.ObservableCollectionT;
 		await Navigation.PushAsync(new GroupingOptionsPage(_viewModel));
 	}

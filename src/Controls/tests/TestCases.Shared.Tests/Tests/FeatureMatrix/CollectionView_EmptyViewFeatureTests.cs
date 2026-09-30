@@ -19,6 +19,16 @@ namespace Microsoft.Maui.TestCases.Tests
 		{
 		}
 
+		void ScrollToAndWaitForFooter(string footer, bool isHorizontal)
+		{
+			if (isHorizontal)
+				App.ScrollRight("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
+			else
+				App.ScrollDown("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
+
+			App.WaitForElement(footer);
+		}
+
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateEmptyViewStringDisplayed()
@@ -181,41 +191,6 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForNoElement("No Items Available(String)");
 		}
-
-#if TEST_FAILS_ON_ANDROID && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS && TEST_FAILS_ON_WINDOWS // Issue Link - https://github.com/dotnet/maui/issues/32404
-
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
-		public void VerifyEmptyViewStringDisplaysCorrectly_WithLeftToRightFlowDirection()
-		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("FlowDirectionLeftToRight");
-			App.Tap("FlowDirectionLeftToRight");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
-			App.WaitForElement("No Items Available(String)");
-			VerifyScreenshot();
-		}
-
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
-		public void VerifyEmptyViewStringDisplaysCorrectly_WithRightToLeftFlowDirection()
-		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("FlowDirectionRightToLeft");
-			App.Tap("FlowDirectionRightToLeft");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
-			App.WaitForElement("No Items Available(String)");
-			VerifyScreenshot();
-		}
-#endif
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
@@ -503,6 +478,8 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Options");
 			App.WaitForElement("ItemsSourceGroupedList");
 			App.Tap("ItemsSourceGroupedList");
+			App.WaitForElement("IsGroupedTrue");
+			App.Tap("IsGroupedTrue");
 			App.WaitForElement("EmptyViewCustomSize");
 			App.Tap("EmptyViewCustomSize");
 			App.WaitForElement("Apply");
@@ -520,6 +497,8 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("EmptyViewCustomSize");
 			App.WaitForElement("ItemsSourceGroupedList");
 			App.Tap("ItemsSourceGroupedList");
+			App.WaitForElement("IsGroupedTrue");
+			App.Tap("IsGroupedTrue");
 			App.WaitForElement("Apply");
 			App.Tap("Apply");
 			App.WaitForNoElement("Custom Empty View (Sized)");
@@ -717,7 +696,6 @@ namespace Microsoft.Maui.TestCases.Tests
 			VerifyScreenshot();
 		}
 
-#if TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS // Issue Link - https://github.com/dotnet/maui/issues/34522
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void VerifyEmptyViewTemplateDisplaysCorrectly_WithRightToLeftFlowDirection()
@@ -733,7 +711,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.WaitForElement("No Template Items Available(Grid View)");
 			VerifyScreenshot();
 		}
-#endif
+
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void VerifyCustomSizedEmptyViewTemplateDisplaysCorrectly_WithLeftToRightFlowDirection()
@@ -750,7 +728,6 @@ namespace Microsoft.Maui.TestCases.Tests
 			VerifyScreenshot();
 		}
 
-#if TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS // Issue Link - https://github.com/dotnet/maui/issues/34522
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void VerifyCustomSizedEmptyViewTemplateDisplaysCorrectly_WithRightToLeftFlowDirection()
@@ -766,7 +743,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			VerifyScreenshot();
 		}
-#endif
+
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateEmptyViewTemplateDisplayed_EmptyObservableCollectionSetFirst()
@@ -984,7 +961,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyViewTemplateDisplayed_AndGroupedListSetFirst()
-		{
+		{ 
 			App.WaitForElement("Options");
 			App.Tap("Options");
 			App.WaitForElement("ItemsSourceGroupedList");
@@ -1175,9 +1152,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			Assert.That(emptyViewBounds.Width, Is.EqualTo(expectedWidth).Within(5));
 			Assert.That(emptyViewBounds.Height, Is.EqualTo(expectedHeight).Within(5));
 		}
-
-#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST
-		//When setting HeightRequest and WidthRequest in the EmptyViewTemplate, as the values were not applied, preventing proper resizing. Issue Link: https://github.com/dotnet/maui/issues/28605
+		 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 		public void ValidateEmptyViewTemplateSize()
@@ -1202,12 +1177,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			Assert.That(emptyViewBounds.Width, Is.EqualTo(expectedWidth).Within(5));
 			Assert.That(emptyViewBounds.Height, Is.EqualTo(expectedHeight).Within(5));
 		}
-#endif
-
-#if TEST_FAILS_ON_ANDROID
-		// CollectionView Footer Becomes Scrollable When EmptyView is Active on Android. Issue Link: https://github.com/dotnet/maui/issues/28350
-		// HeaderTemplate and FooterTemplate are not displayed when ItemsSource is initially set to null on Android. Issue Link: https://github.com/dotnet/maui/issues/28337
-		// Header and footer are not displayed when emptyview selected first Issue Link: https://github.com/dotnet/maui/issues/28351		
+ 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateEmptyViewStringDisplayed_AndHeaderString()
@@ -1272,9 +1242,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.WaitForElement("CollectionView Header(Grid View)");
 		}
 
-#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST
-//Footer Not Displayed at the Bottom When EmptyView is Active in CV2 Issue Link: https://github.com/dotnet/maui/issues/28604
-		[Test]
+ 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void ValidateEmptyViewStringDisplayed_AndFooterString()
 		{
@@ -1370,7 +1338,6 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.WaitForElement("CollectionView Footer(Grid View)");
 		}
 
-//In EmptyView, without explicitly setting HeightRequest and WidthRequest values, the Header and Footer do not appear Issue Link: https://github.com/dotnet/maui/issues/28605
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 		public void ValidateCustomEmptyViewDisplayed_AndHeaderString()
@@ -1402,14 +1369,9 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
 		}
-#endif
-#endif
 
-#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_ANDROID && TEST_FAILS_ON_WINDOWS && TEST_FAILS_ON_CATALYST
-//CollectionView Header and Footer Do Not Align with Horizontal ItemsLayout When EmptyView is Displayed on https://github.com/dotnet/maui/issues/28622
+#if TEST_FAILS_ON_WINDOWS  
 //ItemsLayout does not change its default value on windows Issue Link: https://github.com/dotnet/maui/issues/27946
-//Footer Not Displayed at the Bottom When EmptyView is Active in CV2 Issue Link: https://github.com/dotnet/maui/issues/28604
-//TargetInvocationException Occurs When Selecting Header/Footer After Changing ItemsLayout in CV2 Issue Link : https://github.com/dotnet/maui/issues/28678
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewString_WithHeaderFooterString_WhenVerticalList()
@@ -1428,7 +1390,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
         
 		[Test]
@@ -1449,7 +1411,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
 
 		[Test]
@@ -1470,7 +1432,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
 
 		[Test]
@@ -1491,7 +1453,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
 
 		[Test]
@@ -1512,7 +1474,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
 
 		[Test]
@@ -1533,7 +1495,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
 
 		[Test]
@@ -1554,7 +1516,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
 
 		[Test]
@@ -1575,7 +1537,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
 
 		[Test]
@@ -1596,7 +1558,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
 
 		[Test]
@@ -1617,7 +1579,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
 
 		[Test]
@@ -1638,7 +1600,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
 
 		[Test]
@@ -1659,7 +1621,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
 
 		[Test]
@@ -1680,7 +1642,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
         
 		[Test]
@@ -1701,7 +1663,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
 
 		[Test]
@@ -1722,7 +1684,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
 
 		[Test]
@@ -1743,7 +1705,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
 
 		[Test]
@@ -1764,7 +1726,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
         
 		[Test]
@@ -1785,7 +1747,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
 
 		[Test]
@@ -1806,7 +1768,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
 
 		[Test]
@@ -1827,7 +1789,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
 
 		[Test]
@@ -1848,7 +1810,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
         
 		[Test]
@@ -1869,7 +1831,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
 
 		[Test]
@@ -1890,7 +1852,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
 
 		[Test]
@@ -1911,7 +1873,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
 
 		[Test]
@@ -1932,7 +1894,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
 
 		[Test]
@@ -1953,7 +1915,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
 
 		[Test]
@@ -1974,7 +1936,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
 
 		[Test]
@@ -1995,7 +1957,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
 
 		[Test]
@@ -2016,7 +1978,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
 
 		[Test]
@@ -2037,7 +1999,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
 
 		[Test]
@@ -2058,7 +2020,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
 
 		[Test]
@@ -2079,7 +2041,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
 
 		[Test]
@@ -2100,7 +2062,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
         
 		[Test]
@@ -2121,7 +2083,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
 
 		[Test]
@@ -2142,7 +2104,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
 
 		[Test]
@@ -2163,7 +2125,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
 
 		[Test]
@@ -2184,7 +2146,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
         
 		[Test]
@@ -2205,7 +2167,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
 
 		[Test]
@@ -2226,7 +2188,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
 
 		[Test]
@@ -2247,7 +2209,7 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.Tap("Apply");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
 #endif
 	}

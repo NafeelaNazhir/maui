@@ -210,7 +210,7 @@ public class CollectionView_GroupingFeatureTests : _GalleryUITest
 		App.WaitForElement("Banana");
 	}
 
-#if TEST_FAILS_ON_WINDOWS // [Windows] NullReferenceException thrown When Toggling IsGrouped to True in ObservableCollection Binding Issue Link: https://github.com/dotnet/maui/issues/28824
+
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyIsGrouped_WithFooterString()
@@ -240,11 +240,7 @@ public class CollectionView_GroupingFeatureTests : _GalleryUITest
 		App.Tap(Apply);
 		App.WaitForElement("CollectionView Header(String)");
 	}
-#endif
 
-#if TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS
-	//Test fails on CV2 , GroupHeader and GroupFooter template is not visible  Issue Link: https://github.com/dotnet/maui/issues/28509
-	//Test fails on CV2 , ItemsLayout does not change Issue Link: https://github.com/dotnet/maui/issues/28656
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyGroupHeaderAndFooterTemplate_WithVerticalListAndGroupedList()
@@ -730,11 +726,9 @@ public class CollectionView_GroupingFeatureTests : _GalleryUITest
 		VerifyScreenshot();
 	}
 #endif
-#endif
 
 #if TEST_FAILS_ON_ANDROID && TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_WINDOWS
 //CollectionView Displays Blank UI When Changing IsGrouped and ItemsSourceType Issue Link: https://github.com/dotnet/maui/issues/28826
-//[Windows] NullReferenceException thrown When Toggling IsGrouped to True in ObservableCollection Binding: https://github.com/dotnet/maui/issues/28824
         [Test]
         [ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
         public void VerifyIsGroupedTrue_WithItemSourceObservableCollection()
@@ -855,7 +849,6 @@ public class CollectionView_GroupingFeatureTests : _GalleryUITest
             App.WaitForNoElement("Vegetables");
         }
  
-// [Android] Group Header/Footer Repeated for All Items When IsGrouped is True for ObservableCollection Issue Link: https://github.com/dotnet/maui/issues/28827
         [Test]
         [ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
         public void VerifyIsGrouped_WithGroupHeaderAndFooterTemplateAndObservableCollection()

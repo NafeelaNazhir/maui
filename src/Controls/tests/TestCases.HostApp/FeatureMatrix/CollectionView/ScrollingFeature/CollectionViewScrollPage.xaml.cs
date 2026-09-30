@@ -15,7 +15,7 @@ public partial class CollectionViewScrollPage : ContentPage
 
 	private async void NavigateToOptionsPage_Clicked(object sender, EventArgs e)
 	{
-		BindingContext = _viewModel = new CollectionViewViewModel(isScrollingFeatureTest: true);
+		_viewModel.Reset();
 		_viewModel.ItemsSourceType = ItemsSourceType.ObservableCollectionT3;
 		_viewModel.ScrollToPosition = ScrollToPosition.MakeVisible;
 #if WINDOWS

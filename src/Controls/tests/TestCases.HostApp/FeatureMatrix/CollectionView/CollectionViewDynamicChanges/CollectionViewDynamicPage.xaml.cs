@@ -14,7 +14,7 @@ public partial class CollectionViewDynamicPage : ContentPage
 
 	private async void NavigateToOptionsPage_Clicked(object sender, EventArgs e)
 	{
-		BindingContext = _viewModel = new CollectionViewViewModel();
+		_viewModel.Reset();
 		_viewModel.ItemsSourceType = ItemsSourceType.ObservableCollection5T;
 		await Navigation.PushAsync(new CollectionViewDynamicOptionsPage(_viewModel));
 	}

@@ -18,7 +18,7 @@ public partial class CollectionViewHeaderPage : ContentPage
 
 	private async void NavigateToOptionsPage_Clicked(object sender, EventArgs e)
 	{
-		BindingContext = _viewModel = new CollectionViewViewModel();
+		_viewModel.Reset();
 		_viewModel.ItemsSourceType = ItemsSourceType.ObservableCollection5T;
 		await Navigation.PushAsync(new HeaderFooterOptionsPage(_viewModel));
 	}

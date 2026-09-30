@@ -18,7 +18,7 @@ namespace Maui.Controls.Sample
 
 		private async void NavigateToOptionsPage_Clicked(object sender, EventArgs e)
 		{
-			BindingContext = _viewModel = new CollectionViewViewModel();
+			_viewModel.Reset();
 			await Navigation.PushAsync(new EmptyViewOptionsPage(_viewModel));
 		}
 	}

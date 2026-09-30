@@ -3,6 +3,7 @@ using UITest.Appium;
 using UITest.Core;
 
 namespace Microsoft.Maui.TestCases.Tests;
+
 public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 {
 	public const string HeaderFooterFeatureMatrix = "CollectionView Feature Matrix";
@@ -37,7 +38,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	}
 
 
-#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST //In CV2, unintended synchronization between the HeaderTemplate/FooterTemplate and Header/Footer views, related issue: https://github.com/dotnet/maui/issues/28504
+
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyHeaderStringWithItemsSourceObservableCollection25()
@@ -248,45 +249,45 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
 	}
 
-#if TEST_FAILS_ON_ANDROID //related issue: https://github.com/dotnet/maui/issues/28334
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
-		public void VerifyHeaderStringWhenFooterTemplateView()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderString);
-			App.Tap(HeaderString);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled("Mango");
-			App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
-		}
 
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
-		public void VerifyHeaderViewWhenFooterTemplateView()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-			App.Tap(HeaderGrid);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled("Mango");
-			App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
-		}
-#endif
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
+	public void VerifyHeaderStringWhenFooterTemplateView()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(HeaderString);
+		App.Tap(HeaderString);
+		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
+		App.Tap(FooterTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
+	}
 
-#if TEST_FAILS_ON_WINDOWS && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS //In CV2 related issue: https://github.com/dotnet/maui/issues/28509, In windows related issue: https://github.com/dotnet/maui/issues/28824
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
+	public void VerifyHeaderViewWhenFooterTemplateView()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
+		App.Tap(HeaderGrid);
+		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
+		App.Tap(FooterTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
+	}
+
+
+
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyHeaderStringWhenGroupHeaderTemplateView()
@@ -374,9 +375,8 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Potato");
 	}
-#endif
 
-#if TEST_FAILS_ON_WINDOWS  //related issue: https://github.com/dotnet/maui/issues/28337
+
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void VerifyHeaderStringWhenHeaderTemplateView()
@@ -412,61 +412,61 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
 	}
-#endif
 
-#if TEST_FAILS_ON_WINDOWS && TEST_FAILS_ON_ANDROID && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS //relate issue: https://github.com/dotnet/maui/issues/28824
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
-		public void VerifyHeaderStringWhenIsGroupedTrueOrFalse()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderString);
-			App.Tap(HeaderString);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-			App.Tap(IsGroupedTrue);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderString);
-			App.Tap(HeaderString);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
-			App.Tap(IsGroupedFalse);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-		}
 
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
-		public void VerifyHeaderViewWhenIsGroupedTrueOrFalse()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-			App.Tap(HeaderGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-			App.Tap(IsGroupedTrue);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-			App.Tap(HeaderGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
-			App.Tap(IsGroupedFalse);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-		}
-#endif
+
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
+	public void VerifyHeaderStringWhenIsGroupedTrueOrFalse()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(HeaderString);
+		App.Tap(HeaderString);
+		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
+		App.Tap(IsGroupedTrue);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(HeaderString);
+		App.Tap(HeaderString);
+		App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
+		App.Tap(IsGroupedFalse);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+	}
+
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
+	public void VerifyHeaderViewWhenIsGroupedTrueOrFalse()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
+		App.Tap(HeaderGrid);
+		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
+		App.Tap(IsGroupedTrue);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
+		App.Tap(HeaderGrid);
+		App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
+		App.Tap(IsGroupedFalse);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+	}
+
 
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
@@ -502,7 +502,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 	}
 
-#if TEST_FAILS_ON_WINDOWS && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS //In windows, related issue: https://github.com/dotnet/maui/issues/27946 and In CV2, related issue: https://github.com/dotnet/maui/issues/28678
+#if TEST_FAILS_ON_WINDOWS  //In windows, related issue: https://github.com/dotnet/maui/issues/27946  
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void VerifyHeaderStringWithItemsLayoutVerticalGrid()
@@ -610,60 +610,56 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	}
 #endif
 
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
+	public void VerifyHeaderTemplateWithItemsSourceObserableCollection5()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
+		App.Tap(HeaderTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+	}
 
-#if TEST_FAILS_ON_ANDROID //related issue: https://github.com/dotnet/maui/issues/28337
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
-		public void VerifyHeaderTemplateWithItemsSourceObserableCollection5()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled("Mango");
-		}
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
+	public void VerifyHeaderTemplateWithItemsSourceObserableCollection25()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
+		App.Tap(HeaderTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(ItemsSourceObservableCollection25);
+		App.Tap(ItemsSourceObservableCollection25);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.ScrollDown("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
+		App.WaitForElementTillPageNavigationSettled("Pepper");
+		App.WaitForNoElement("Header Template(Grid View)");
+	}
 
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
-		public void VerifyHeaderTemplateWithItemsSourceObserableCollection25()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(ItemsSourceObservableCollection25);
-			App.Tap(ItemsSourceObservableCollection25);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.ScrollDown("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
-			App.WaitForElementTillPageNavigationSettled("Pepper");
-			App.WaitForNoElement("Header Template(Grid View)");
-		}
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
+	public void VerifyHeaderTemplateWithItemsSourceNone()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
+		App.Tap(HeaderTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(ItemsSourceNone);
+		App.Tap(ItemsSourceNone);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
+	}
 
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
-		public void VerifyHeaderTemplateWithItemsSourceNone()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(ItemsSourceNone);
-			App.Tap(ItemsSourceNone);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
-		}
-#endif
-
-#if TEST_FAILS_ON_ANDROID && TEST_FAILS_ON_WINDOWS //In windows related issue:https://github.com/dotnet/maui/issues/28022, In related issue: https://github.com/dotnet/maui/issues/28337
-		[Test]
+#if TEST_FAILS_ON_WINDOWS //In windows related issue:https://github.com/dotnet/maui/issues/28022 
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void VerifyHeaderTemplateWhenEmptyViewString()
 		{
@@ -682,27 +678,26 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		}
 #endif
 
-#if TEST_FAILS_ON_ANDROID //related issue: https://github.com/dotnet/maui/issues/28337
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
-		public void VerifyHeaderTempalteWhenFooterTemplateView()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled("Mango");
-			App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
-		}
-#endif
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
+	public void VerifyHeaderTempalteWhenFooterTemplateView()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
+		App.Tap(HeaderTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
+		App.Tap(FooterTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
+	}
 
-#if TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS && TEST_FAILS_ON_WINDOWS //In CV2: related issue: https://github.com/dotnet/maui/issues/28824 and In windows: https://github.com/dotnet/maui/issues/28824
+
+#if TEST_FAILS_ON_WINDOWS
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyHeaderTemplateWhenGroupFooterTemplate()
@@ -747,9 +742,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("Potato");
 	}
 #endif
-#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_WINDOWS  //In CV2, unintended synchronization between the HeaderTemplate/FooterTemplate and Header/Footer views, related issue: https://github.com/dotnet/maui/issues/28504
-	//In windows, related issue: https://github.com/dotnet/maui/issues/28337
-	[Test]
+
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 	public void VerifyHeaderTemplateWhenHeaderString()
 	{
@@ -782,35 +775,32 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 		App.WaitForNoElement("HeaderViewLabel");
 	}
-#endif
 
-#if TEST_FAILS_ON_ANDROID && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS && TEST_FAILS_ON_WINDOWS //In all platforms, issue related: https://github.com/dotnet/maui/issues/28824 and CV2, related issues:https://github.com/dotnet/maui/issues/28504
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
-		public void VerifyHeaderTemplateWhenIsGroupedTrueOrFalse()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-			App.Tap(IsGroupedTrue);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
-			App.Tap(IsGroupedFalse);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-		}
-#endif
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
+	public void VerifyHeaderTemplateWhenIsGroupedTrueOrFalse()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
+		App.Tap(HeaderTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
+		App.Tap(IsGroupedTrue);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
+		App.Tap(HeaderTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
+		App.Tap(IsGroupedFalse);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+	}
 
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
@@ -829,7 +819,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("Mango");
 	}
 
-#if TEST_FAILS_ON_WINDOWS && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS && TEST_FAILS_ON_ANDROID //In windows, related issue: https://github.com/dotnet/maui/issues/27946, In CV2, related issue: https://github.com/dotnet/maui/issues/28678 and In android related issue:https://github.com/dotnet/maui/issues/28337
+#if TEST_FAILS_ON_WINDOWS //In windows, related issue: https://github.com/dotnet/maui/issues/27946 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyHeaderTemplateWithItemsLayoutVerticalGrid()
@@ -884,7 +874,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		}
 #endif
 
-#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST //In CV2, unintended synchronization between the HeaderTemplate/FooterTemplate and Header/Footer views, related issue: https://github.com/dotnet/maui/issues/28504
+
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 	public void VerifyFooterStringWithItemsSourceObservableCollection5()
@@ -984,8 +974,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
 	}
 
-#if TEST_FAILS_ON_ANDROID && TEST_FAILS_ON_WINDOWS && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS //In android related issue:https://github.com/dotnet/maui/issues/28622, In windows related issue:https://github.com/dotnet/maui/issues/28022 and In CV2, related issue: https://github.com/dotnet/maui/issues/28604
-		[Test]
+#if TEST_FAILS_ON_WINDOWS
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyFooterStringWhenEmptyViewString()
 		{
@@ -1022,7 +1011,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		}
 #endif
 
-#if TEST_FAILS_ON_WINDOWS //In Windows related issue: https://github.com/dotnet/maui/issues/28337
+
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void VerifyFooterStringWhenFooterTemplateView()
@@ -1058,9 +1047,8 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("Mango");
 		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
 	}
-#endif
 
-#if TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS && TEST_FAILS_ON_WINDOWS//In CV2 related issues:https://github.com/dotnet/maui/issues/28509
+
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 	public void VerifyFooterStringWhenGroupFooterTemplateView()
@@ -1152,7 +1140,6 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("Potato");
 		App.WaitForElementTillPageNavigationSettled("GroupHeaderTemplateLabel");
 	}
-#endif
 
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
@@ -1226,101 +1213,98 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
 	}
 
-#if TEST_FAILS_ON_ANDROID //related issue: https://github.com/dotnet/maui/issues/28337
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
-		public void VerifyFooterStringWhenHeaderTemplate()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterString);
-			App.Tap(FooterString);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled("Mango");
-			App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
-		}
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
+	public void VerifyFooterStringWhenHeaderTemplate()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(FooterString);
+		App.Tap(FooterString);
+		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
+		App.Tap(HeaderTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+		App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
+	}
 
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
-		public void VerifyFooterViewWhenHeaderTemplate()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterGrid);
-			App.Tap(FooterGrid);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled("Mango");
-			App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
-		}
-#endif
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
+	public void VerifyFooterViewWhenHeaderTemplate()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(FooterGrid);
+		App.Tap(FooterGrid);
+		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
+		App.Tap(HeaderTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+		App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
+	}
 
-#if TEST_FAILS_ON_ANDROID && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS && TEST_FAILS_ON_WINDOWS //related isssue: https://github.com/dotnet/maui/issues/28824
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
-		public void VerifyFooterStringWhenIsGroupedTrueOrFalse()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterString);
-			App.Tap(FooterString);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-			App.Tap(IsGroupedTrue);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled("Mango");
-			App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterString);
-			App.Tap(FooterString);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
-			App.Tap(IsGroupedFalse);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled("Mango");
-			App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
-		}
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
+	public void VerifyFooterStringWhenIsGroupedTrueOrFalse()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(FooterString);
+		App.Tap(FooterString);
+		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
+		App.Tap(IsGroupedTrue);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+		App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(FooterString);
+		App.Tap(FooterString);
+		App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
+		App.Tap(IsGroupedFalse);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+		App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
+	}
 
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
-		public void VerifyFooterViewWhenIsGroupedTrueOrFalse()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterGrid);
-			App.Tap(FooterGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-			App.Tap(IsGroupedTrue);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled("Mango");
-			App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterGrid);
-			App.Tap(FooterGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
-			App.Tap(IsGroupedFalse);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled("Mango");
-			App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
-		}
-#endif
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
+	public void VerifyFooterViewWhenIsGroupedTrueOrFalse()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(FooterGrid);
+		App.Tap(FooterGrid);
+		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
+		App.Tap(IsGroupedTrue);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+		App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(FooterGrid);
+		App.Tap(FooterGrid);
+		App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
+		App.Tap(IsGroupedFalse);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+		App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
+	}
+
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyFooterStringWhenBasicDataTemplateView()
@@ -1353,7 +1337,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("Apple");
 	}
 
-#if TEST_FAILS_ON_WINDOWS && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS //In windows, related issue: https://github.com/dotnet/maui/issues/27946 and In CV2, related issue: https://github.com/dotnet/maui/issues/28678
+#if TEST_FAILS_ON_WINDOWS //In windows, related issue: https://github.com/dotnet/maui/issues/27946  
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 	public void VerifyFooterStringWithItemsLayoutVerticalGrid()
@@ -1458,23 +1442,21 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
 	}
 #endif
-#endif
 
-#if TEST_FAILS_ON_ANDROID //related issue: https://github.com/dotnet/maui/issues/28337
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
-		public void VerifyFooterTemplateWithItemsSourceObservableCollections5()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-		}
-#endif
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
+	public void VerifyFooterTemplateWithItemsSourceObservableCollections5()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
+		App.Tap(FooterTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+	}
+
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyFooterTemplateWithItemsSourceObservableCollections25()
@@ -1508,7 +1490,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
 	}
 
-#if TEST_FAILS_ON_WINDOWS && TEST_FAILS_ON_ANDROID && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS //In windows related issue:https://github.com/dotnet/maui/issues/28022, In android: https://github.com/dotnet/maui/issues/28101 and In CV2, related issue: https://github.com/dotnet/maui/issues/28604 and https://github.com/dotnet/maui/issues/28504
+#if TEST_FAILS_ON_WINDOWS //In windows related issue:https://github.com/dotnet/maui/issues/28022 
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
@@ -1529,7 +1511,8 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		}
 #endif
 
-#if TEST_FAILS_ON_WINDOWS && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS //In Windows, related issue: https://github.com/dotnet/maui/issues/28337 and In CV2, related issue: https://github.com/dotnet/maui/issues/28504
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 	public void VerifyFooterTemplateWhenFooterString()
 	{
 		App.WaitForElementTillPageNavigationSettled(Options);
@@ -1563,9 +1546,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("Mango");
 		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
 	}
-#endif
 
-#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_WINDOWS //In CV2 related issues: https://github.com/dotnet/maui/issues/28509 and In windows, related issue: https://github.com/dotnet/maui/issues/28824
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyFooterTemplateWhenGroupFooterTemplateView()
@@ -1611,95 +1592,90 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("Potato");
 		App.WaitForElementTillPageNavigationSettled("GroupHeaderTemplateLabel");
 	}
-#endif
 
-#if TEST_FAILS_ON_ANDROID && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS //In android,related issue: https://github.com/dotnet/maui/issues/28337 and In CV2, reltaed issue:https://github.com/dotnet/maui/issues/28504
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
-		public void VerifyFooterTemplateWhenHeaderString()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(HeaderString);
-			App.Tap(HeaderString);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled("Mango");
-			App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
-		}
 
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
-		public void VerifyFooterTemplateWhenHeaderView()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-			App.Tap(HeaderGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled("Mango");
-			App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
-		}
-#endif
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
+	public void VerifyFooterTemplateWhenHeaderString()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
+		App.Tap(FooterTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(HeaderString);
+		App.Tap(HeaderString);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
+	}
 
-#if TEST_FAILS_ON_ANDROID //In android,related issue: https://github.com/dotnet/maui/issues/28337
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
-		public void VerifyFooterTemplateWhenHeaderTemplate()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled("Mango");
-			App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
-		}
-#endif
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
+	public void VerifyFooterTemplateWhenHeaderView()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
+		App.Tap(FooterTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
+		App.Tap(HeaderGrid);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
+	}
 
-#if TEST_FAILS_ON_ANDROID && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS && TEST_FAILS_ON_WINDOWS //related issue: https://github.com/dotnet/maui/issues/28824
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
-		public void VerifyFooterTemplateWhenIsGroupedTrueOrFalse()
-		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-			App.Tap(IsGroupedTrue);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled("Mango");
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
-			App.Tap(IsGroupedFalse);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
-			App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
-			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled("Mango");
-		}
-#endif
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
+	public void VerifyFooterTemplateWhenHeaderTemplate()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
+		App.Tap(FooterTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
+		App.Tap(HeaderTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
+	}
+
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
+	public void VerifyFooterTemplateWhenIsGroupedTrueOrFalse()
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
+		App.Tap(FooterTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
+		App.Tap(IsGroupedTrue);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
+		App.Tap(FooterTemplateGrid);
+		App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
+		App.Tap(IsGroupedFalse);
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+	}
+
 
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
@@ -1717,7 +1693,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		App.WaitForElementTillPageNavigationSettled("Apple");
 	}
 
-#if TEST_FAILS_ON_WINDOWS && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS && TEST_FAILS_ON_ANDROID //In windows, related issue: https://github.com/dotnet/maui/issues/27946, In CV2, related issue: https://github.com/dotnet/maui/issues/28678, In android related issue: https://github.com/dotnet/maui/issues/28337
+#if TEST_FAILS_ON_WINDOWS //In windows, related issue: https://github.com/dotnet/maui/issues/27946
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyFooterTemplateWithItemsLayoutVerticalGrid()
@@ -1771,5 +1747,5 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 
 		}
 #endif
-#endif
+
 }
