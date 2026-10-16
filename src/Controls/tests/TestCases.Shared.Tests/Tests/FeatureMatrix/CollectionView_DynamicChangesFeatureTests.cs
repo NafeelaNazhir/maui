@@ -21,176 +21,132 @@ public class CollectionView_DynamicChangesFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void ValidateDynamicItemTemplateDisplayed()
 	{
-		App.WaitForElement(Options);
-		App.Tap(Options);
-		App.WaitForElement("ItemTemplateBasic");
-		App.Tap("ItemTemplateBasic");
-		App.WaitForElement(Apply);
-		App.Tap(Apply);
+		ApplyOptions("ItemTemplateBasic", "ItemsSourceNone", "ItemsSourceObservableCollection");
+		App.WaitForElement("DynamicItemTemplateLabel");
 		App.WaitForElement("Apple");
 		App.WaitForElement("Orange");
-		App.WaitForElement("ItemTemplateButton");
-		App.Tap("ItemTemplateButton");
+
+		WaitAndTap("ItemTemplateButton");
 		App.WaitForElement("Template 1 - Apple");
 		App.WaitForElement("Template 1 - Orange");
-		App.Tap("ItemTemplateButton");
+		App.WaitForNoElement("Apple");
+		App.WaitForNoElement("Orange");
+
+		WaitAndTap("ItemTemplateButton");
 		App.WaitForElement("Template 2 - Apple");
 		App.WaitForElement("Template 2 - Orange");
+		App.WaitForNoElement("Template 1 - Apple");
+		App.WaitForNoElement("Template 1 - Orange");
 	}
 
-#if TEST_FAILS_ON_ANDROID
-	//Dynamic Updates to CollectionView Header/Footer and Templates Are Not Displayed Issue Link: https://github.com/dotnet/maui/issues/28676
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 	public void ValidateDynamicHeaderStringDisplayed()
 	{
-		App.WaitForElement(Options);
-		App.Tap(Options);
-		App.WaitForElement("HeaderString");
-		App.Tap("HeaderString");
-		App.WaitForElement(Apply);
-		App.Tap(Apply);
-		App.WaitForElement("Default Header String");
-		App.WaitForElement("HeaderStringButton");
-		App.Tap("HeaderStringButton");
-		App.WaitForElement("Header String1");
-		App.Tap("HeaderStringButton");
-		App.WaitForElement("Header String2");
+		ApplyOptions("HeaderString");
+		VerifyDynamicUpdates("HeaderStringButton", "Default Header String", "Header String1", "Header String2");
 	}
 
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 	public void ValidateDynamicHeaderGridDisplayed()
 	{
-		App.WaitForElement(Options);
-		App.Tap(Options);
-		App.WaitForElement("HeaderGrid");
-		App.Tap("HeaderGrid");
-		App.WaitForElement(Apply);
-		App.Tap(Apply);
-		App.WaitForElement("Default Header Grid");
-		App.WaitForElement("HeaderGridButton");
-		App.Tap("HeaderGridButton");
-		App.WaitForElement("Header Grid1");
-		App.Tap("HeaderGridButton");
-		App.WaitForElement("Header Grid2");
+		ApplyOptions("HeaderGrid");
+		VerifyDynamicUpdates("HeaderGridButton", "Default Header Grid", "Header Grid1", "Header Grid2");
 	}
 
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 	public void ValidateDynamicHeaderTemplateDisplayed()
 	{
-		App.WaitForElement(Options);
-		App.Tap(Options);
-		App.WaitForElement("HeaderTemplateGrid");
-		App.Tap("HeaderTemplateGrid");
-		App.WaitForElement(Apply);
-		App.Tap(Apply);
-		App.WaitForElement("Default HeaderTemplate");
-		App.WaitForElement("HeaderTemplateButton");
-		App.Tap("HeaderTemplateButton");
-		App.WaitForElement("Header Template1");
-		App.Tap("HeaderTemplateButton");
-		App.WaitForElement("Header Template2");
+		ApplyOptions("HeaderTemplateGrid");
+		VerifyDynamicUpdates("HeaderTemplateButton", "Default HeaderTemplate", "Header Template1", "Header Template2");
 	}
 
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 	public void ValidateDynamicFooterStringDisplayed()
 	{
-		App.WaitForElement(Options);
-		App.Tap(Options);
-		App.WaitForElement("FooterString");
-		App.Tap("FooterString");
-		App.WaitForElement(Apply);
-		App.Tap(Apply);
-		App.WaitForElement("Default Footer String");
-		App.WaitForElement("FooterStringButton");
-		App.Tap("FooterStringButton");
-		App.WaitForElement("Footer String1");
-		App.Tap("FooterStringButton");
-		App.WaitForElement("Footer String2");
+		ApplyOptions("FooterString");
+		VerifyDynamicUpdates("FooterStringButton", "Default Footer String", "Footer String1", "Footer String2");
 	}
 
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 	public void ValidateDynamicFooterGridDisplayed()
 	{
-		App.WaitForElement(Options);
-		App.Tap(Options);
-		App.WaitForElement("FooterGrid");
-		App.Tap("FooterGrid");
-		App.WaitForElement(Apply);
-		App.Tap(Apply);
-		App.WaitForElement("Default Footer Grid");
-		App.WaitForElement("FooterGridButton");
-		App.Tap("FooterGridButton");
-		App.WaitForElement("Footer Grid1");
-		App.Tap("FooterGridButton");
-		App.WaitForElement("Footer Grid2");
+		ApplyOptions("FooterGrid");
+		VerifyDynamicUpdates("FooterGridButton", "Default Footer Grid", "Footer Grid1", "Footer Grid2");
 	}
 
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void ValidateDynamicFooterTemplateDisplayed()
 	{
-		App.WaitForElement(Options);
-		App.Tap(Options);
-		App.WaitForElement("FooterTemplateGrid");
-		App.Tap("FooterTemplateGrid");
-		App.WaitForElement(Apply);
-		App.Tap(Apply);
-		App.WaitForElement("Default FooterTemplate");
-		App.WaitForElement("FooterTemplateButton");
-		App.Tap("FooterTemplateButton");
-		App.WaitForElement("Footer Template1");
-		App.Tap("FooterTemplateButton");
-		App.WaitForElement("Footer Template2");
+		ApplyOptions("FooterTemplateGrid");
+		VerifyDynamicUpdates("FooterTemplateButton", "Default FooterTemplate", "Footer Template1", "Footer Template2");
 	}
-#endif
 
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 	public void ValidateDynamicGroupHeaderTemplateDisplayed()
 	{
-		App.WaitForElement(Options);
-		App.Tap(Options);
-		App.WaitForElement("ItemsSourceGroupedList");
-		App.Tap("ItemsSourceGroupedList");
-		App.WaitForElement("IsGroupedTrue");
-		App.Tap("IsGroupedTrue");
-		App.WaitForElement("GroupHeaderTemplateGrid");
-		App.Tap("GroupHeaderTemplateGrid");
-		App.WaitForElement(Apply);
-		App.Tap(Apply);
-		App.WaitForElement("Default GroupHeaderTemplate");
-		App.WaitForElement("GroupHeaderTemplateButton");
-		App.Tap("GroupHeaderTemplateButton");
-		App.WaitForElement("GroupHeaderTemplate1");
-		App.Tap("GroupHeaderTemplateButton");
-		App.WaitForElement("GroupHeaderTemplate2");
+		ApplyOptions("ItemsSourceGroupedList", "IsGroupedTrue", "GroupHeaderTemplateGrid");
+		VerifyDynamicUpdates("GroupHeaderTemplateButton", "Default GroupHeaderTemplate", "GroupHeaderTemplate1", "GroupHeaderTemplate2");
 	}
 
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void ValidateDynamicGroupFooterTemplateDisplayed()
 	{
-		App.WaitForElement(Options);
-		App.Tap(Options);
-		App.WaitForElement("ItemsSourceGroupedList");
-		App.Tap("ItemsSourceGroupedList");
-		App.WaitForElement("IsGroupedTrue");
-		App.Tap("IsGroupedTrue");
-		App.WaitForElement("GroupFooterTemplateGrid");
-		App.Tap("GroupFooterTemplateGrid");
-		App.WaitForElement(Apply);
-		App.Tap(Apply);
-		App.WaitForElement("Default GroupFooterTemplate");
-		App.WaitForElement("GroupFooterTemplateButton");
-		App.Tap("GroupFooterTemplateButton");
-		App.WaitForElement("GroupFooterTemplate1");
-		App.Tap("GroupFooterTemplateButton");
-		App.WaitForElement("GroupFooterTemplate2");
+		ApplyOptions("ItemsSourceGroupedList", "IsGroupedTrue", "GroupFooterTemplateGrid");
+		VerifyDynamicUpdates("GroupFooterTemplateButton", "Default GroupFooterTemplate", "GroupFooterTemplate1", "GroupFooterTemplate2");
+	}
+
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
+	public void ValidateDynamicHeaderSelectionChanges()
+	{
+		ApplyOptions("HeaderString", "HeaderGrid");
+		App.WaitForElement("Default Header Grid");
+
+		WaitAndTap("HeaderStringButton");
+		App.WaitForNoElement("Header String1");
+		VerifyDynamicUpdates("HeaderGridButton", "Default Header Grid", "Header Grid1", "Header Grid2");
+
+		ApplyOptions("HeaderString", "HeaderGrid", "HeaderNone");
+		App.WaitForElement("Apple");
+		App.WaitForNoElement("Default Header String");
+		App.WaitForNoElement("Default Header Grid");
+		App.WaitForNoElement("Header Grid2");
+
+		WaitAndTap("HeaderStringButton");
+		App.WaitForNoElement("Header String1");
+		WaitAndTap("HeaderGridButton");
+		App.WaitForNoElement("Header Grid1");
+	}
+
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
+	public void ValidateDynamicFooterSelectionChanges()
+	{
+		ApplyOptions("FooterString", "FooterGrid");
+		App.WaitForElement("Default Footer Grid");
+
+		WaitAndTap("FooterStringButton");
+		App.WaitForNoElement("Footer String1");
+		VerifyDynamicUpdates("FooterGridButton", "Default Footer Grid", "Footer Grid1", "Footer Grid2");
+
+		ApplyOptions("FooterString", "FooterGrid", "FooterNone");
+		App.WaitForElement("Apple");
+		App.WaitForNoElement("Default Footer String");
+		App.WaitForNoElement("Default Footer Grid");
+		App.WaitForNoElement("Footer Grid2");
+
+		WaitAndTap("FooterStringButton");
+		App.WaitForNoElement("Footer String1");
+		WaitAndTap("FooterGridButton");
+		App.WaitForNoElement("Footer Grid1");
 	}
 
 #if TEST_FAILS_ON_WINDOWS
@@ -200,60 +156,82 @@ public class CollectionView_DynamicChangesFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void ValidateDynamicEmptyViewStringDisplayed()
 	{
-		App.WaitForElement(Options);
-		App.Tap(Options);
-		App.WaitForElement("EmptyViewString");
-		App.Tap("EmptyViewString");
-		App.WaitForElement("ItemsSourceNone");
-		App.Tap("ItemsSourceNone");
-		App.WaitForElement(Apply);
-		App.Tap(Apply);
-		App.WaitForElement("No Items Available(String)");
-		App.WaitForElement("EmptyViewStringButton");
-		App.Tap("EmptyViewStringButton");
-		App.WaitForElement("EmptyView String1: No items available");
-		App.Tap("EmptyViewStringButton");
-		App.WaitForElement("EmptyView String2: No items available");
+		ApplyOptions("EmptyViewString", "ItemsSourceNone");
+		VerifyDynamicUpdates("EmptyViewStringButton", "No Items Available(String)",
+			"EmptyView String1: No items available", "EmptyView String2: No items available");
 	}
 
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void ValidateDynamicEmptyViewGridDisplayed()
 	{
-		App.WaitForElement(Options);
-		App.Tap(Options);
-		App.WaitForElement("EmptyViewGrid");
-		App.Tap("EmptyViewGrid");
-		App.WaitForElement("ItemsSourceNone");
-		App.Tap("ItemsSourceNone");
-		App.WaitForElement(Apply);
-		App.Tap(Apply);
-		App.WaitForElement("No Items Available(Grid View)");
-		App.WaitForElement("EmptyViewGridButton");
-		App.Tap("EmptyViewGridButton");
-		App.WaitForElement("EmptyView Grid1: No items available");
-		App.Tap("EmptyViewGridButton");
-		App.WaitForElement("EmptyView Grid2: No items available");
+		ApplyOptions("EmptyViewGrid", "ItemsSourceNone");
+		VerifyDynamicUpdates("EmptyViewGridButton", "No Items Available(Grid View)",
+			"EmptyView Grid1: No items available", "EmptyView Grid2: No items available");
 	}
 
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void ValidateDynamicEmptyViewTemplateDisplayed()
 	{
-		App.WaitForElement(Options);
-		App.Tap(Options);
-		App.WaitForElement("EmptyViewTemplateGrid");
-		App.Tap("EmptyViewTemplateGrid");
-		App.WaitForElement("ItemsSourceNone");
-		App.Tap("ItemsSourceNone");
-		App.WaitForElement(Apply);
-		App.Tap(Apply);
-		App.WaitForElement("No Template Items Available(Grid View)");
-		App.WaitForElement("EmptyViewTemplateButton");
-		App.Tap("EmptyViewTemplateButton");
-		App.WaitForElement("EmptyViewTemplate1: No items available");
-		App.Tap("EmptyViewTemplateButton");
-		App.WaitForElement("EmptyViewTemplate2: No items available");
+		ApplyOptions("EmptyViewTemplateGrid", "ItemsSourceNone");
+		VerifyDynamicUpdates("EmptyViewTemplateButton", "No Template Items Available(Grid View)",
+			"EmptyViewTemplate1: No items available", "EmptyViewTemplate2: No items available");
+	}
+
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
+	public void ValidateDynamicEmptyViewSelectionChanges()
+	{
+		ApplyOptions("EmptyViewString", "EmptyViewGrid", "ItemsSourceNone");
+		App.WaitForElement("No Items Available(Grid View)");
+
+		WaitAndTap("EmptyViewStringButton");
+		App.WaitForNoElement("EmptyView String1: No items available");
+		VerifyDynamicUpdates("EmptyViewGridButton", "No Items Available(Grid View)",
+			"EmptyView Grid1: No items available", "EmptyView Grid2: No items available");
+
+		ApplyOptions("EmptyViewString", "EmptyViewGrid", "EmptyViewNone", "ItemsSourceNone");
+		App.WaitForElement("EmptyViewGridButton");
+		App.WaitForNoElement("No Items Available(String)");
+		App.WaitForNoElement("No Items Available(Grid View)");
+		App.WaitForNoElement("EmptyView Grid2: No items available");
+
+		WaitAndTap("EmptyViewStringButton");
+		App.WaitForNoElement("EmptyView String1: No items available");
+		WaitAndTap("EmptyViewGridButton");
+		App.WaitForNoElement("EmptyView Grid1: No items available");
 	}
 #endif
+
+	private void ApplyOptions(params string[] optionIds)
+	{
+		WaitAndTap(Options);
+
+		foreach (var optionId in optionIds)
+		{
+			WaitAndTap(optionId);
+		}
+
+		WaitAndTap(Apply);
+	}
+
+	private void VerifyDynamicUpdates(string buttonId, string initialText, string firstUpdateText, string secondUpdateText)
+	{
+		App.WaitForElement(initialText);
+
+		WaitAndTap(buttonId);
+		App.WaitForElement(firstUpdateText);
+		App.WaitForNoElement(initialText);
+
+		WaitAndTap(buttonId);
+		App.WaitForElement(secondUpdateText);
+		App.WaitForNoElement(firstUpdateText);
+	}
+
+	private void WaitAndTap(string automationId)
+	{
+		App.WaitForElement(automationId);
+		App.Tap(automationId);
+	}
 }
