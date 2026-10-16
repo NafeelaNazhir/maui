@@ -640,6 +640,50 @@ public class CollectionViewViewModel : INotifyPropertyChanged
 		}
 	}
 
+	public void ResetDynamicProperties()
+	{
+		ItemsSourceType = ItemsSourceType.None;
+		ItemsSourceStringItems = true;
+		IsGrouped = false;
+
+		EmptyView = null;
+		Header = null;
+		Footer = null;
+		EmptyViewTemplate = null;
+		HeaderTemplate = null;
+		FooterTemplate = null;
+		GroupHeaderTemplate = new DataTemplate(() =>
+		{
+			var stackLayout = new StackLayout
+			{
+				BackgroundColor = Colors.LightGray
+			};
+			var label = new Label
+			{
+				FontAttributes = FontAttributes.Bold,
+				FontSize = 24,
+			};
+			label.SetBinding(Label.TextProperty, "Key");
+			stackLayout.Children.Add(label);
+			return stackLayout;
+		});
+		GroupFooterTemplate = null;
+		IsHeaderStringSelected = false;
+		IsFooterStringSelected = false;
+		IsHeaderGridSelected = false;
+		IsFooterGridSelected = false;
+		IsHeaderTemplateViewSelected = false;
+		IsFooterTemplateViewSelected = false;
+		IsGroupHeaderTemplateViewSelected = false;
+		IsGroupFooterTemplateViewSelected = false;
+		IsEmptyViewStringSelected = false;
+		IsEmptyViewGridSelected = false;
+		IsEmptyViewTemplateSelected = false;
+		IsItemTemplateSelected = false;
+
+		ItemsSourceType = ItemsSourceType.ObservableCollection5T;
+	}
+
 	private void LoadItems(bool isScrollingFeatureTest = false)
 	{
 		_observableCollection = new ObservableCollection<CollectionViewTestItem>();

@@ -6,18 +6,24 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 
 	public CollectionViewDynamicOptionsPage(CollectionViewViewModel viewModel)
 	{
-		InitializeComponent();
 		_viewModel = viewModel;
+		InitializeComponent();
 		BindingContext = _viewModel;
 	}
 
-	private void ApplyButton_Clicked(object sender, EventArgs e)
+	private async void ApplyButton_Clicked(object sender, EventArgs e)
 	{
-		Navigation.PopAsync();
+		await Navigation.PopAsync();
 	}
 
 	private void OnEmptyViewChanged(object sender, CheckedChangedEventArgs e)
 	{
+		if (!e.Value)
+			return;
+
+		_viewModel.IsEmptyViewStringSelected = sender == EmptyViewString;
+		_viewModel.IsEmptyViewGridSelected = sender == EmptyViewGrid;
+
 		if (EmptyViewNone.IsChecked)
 		{
 			_viewModel.EmptyView = null;
@@ -25,7 +31,6 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 		else if (EmptyViewString.IsChecked)
 		{
 			_viewModel.EmptyView = "No Items Available(String)";
-			_viewModel.IsEmptyViewStringSelected = true;
 		}
 		else if (EmptyViewGrid.IsChecked)
 		{
@@ -41,13 +46,18 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 				TextColor = Colors.Blue
 			});
 			_viewModel.EmptyView = grid;
-			_viewModel.IsEmptyViewGridSelected = true;
 
 		}
 	}
 
 	private void OnHeaderChanged(object sender, CheckedChangedEventArgs e)
 	{
+		if (!e.Value)
+			return;
+
+		_viewModel.IsHeaderStringSelected = sender == HeaderString;
+		_viewModel.IsHeaderGridSelected = sender == HeaderGrid;
+
 		if (HeaderNone.IsChecked)
 		{
 			_viewModel.Header = null;
@@ -55,7 +65,6 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 		else if (HeaderString.IsChecked)
 		{
 			_viewModel.Header = "Default Header String";
-			_viewModel.IsHeaderStringSelected = true;
 		}
 		else if (HeaderGrid.IsChecked)
 		{
@@ -71,12 +80,17 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 				TextColor = Colors.Blue
 			});
 			_viewModel.Header = grid;
-			_viewModel.IsHeaderGridSelected = true;
 		}
 	}
 
 	private void OnFooterChanged(object sender, CheckedChangedEventArgs e)
 	{
+		if (!e.Value)
+			return;
+
+		_viewModel.IsFooterStringSelected = sender == FooterString;
+		_viewModel.IsFooterGridSelected = sender == FooterGrid;
+
 		if (FooterNone.IsChecked)
 		{
 			_viewModel.Footer = null;
@@ -84,7 +98,6 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 		else if (FooterString.IsChecked)
 		{
 			_viewModel.Footer = "Default Footer String";
-			_viewModel.IsFooterStringSelected = true;
 		}
 		else if (FooterGrid.IsChecked)
 		{
@@ -100,11 +113,15 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 				TextColor = Colors.Red
 			});
 			_viewModel.Footer = grid;
-			_viewModel.IsFooterGridSelected = true;
 		}
 	}
 	private void OnEmptyViewTemplateChanged(object sender, CheckedChangedEventArgs e)
 	{
+		if (!e.Value)
+			return;
+
+		_viewModel.IsEmptyViewTemplateSelected = sender == EmptyViewTemplateGrid;
+
 		if (EmptyViewTemplateNone.IsChecked)
 		{
 			_viewModel.EmptyViewTemplate = null;
@@ -126,16 +143,19 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 				return grid;
 
 			});
-			_viewModel.IsEmptyViewTemplateSelected = true;
 		}
 	}
 
 	private void OnHeaderTemplateChanged(object sender, CheckedChangedEventArgs e)
 	{
+		if (!e.Value)
+			return;
+
+		_viewModel.IsHeaderTemplateViewSelected = sender == HeaderTemplateGrid;
+
 		if (HeaderTemplateNone.IsChecked)
 		{
 			_viewModel.HeaderTemplate = null;
-			_viewModel.IsHeaderTemplateViewSelected = false;
 
 		}
 		else if (HeaderTemplateGrid.IsChecked)
@@ -160,16 +180,19 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 				return grid;
 
 			});
-			_viewModel.IsHeaderTemplateViewSelected = true;
 		}
 	}
 
 	private void OnFooterTemplateChanged(object sender, CheckedChangedEventArgs e)
 	{
+		if (!e.Value)
+			return;
+
+		_viewModel.IsFooterTemplateViewSelected = sender == FooterTemplateGrid;
+
 		if (FooterTemplateNone.IsChecked)
 		{
 			_viewModel.FooterTemplate = null;
-			_viewModel.IsFooterTemplateViewSelected = false;
 		}
 		else if (FooterTemplateGrid.IsChecked)
 		{
@@ -192,12 +215,16 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 				});
 				return grid;
 			});
-			_viewModel.IsFooterTemplateViewSelected = true;
 		}
 	}
 
 	private void OnGroupHeaderTemplateChanged(object sender, CheckedChangedEventArgs e)
 	{
+		if (!e.Value)
+			return;
+
+		_viewModel.IsGroupHeaderTemplateViewSelected = sender == GroupHeaderTemplateGrid;
+
 		if (GroupHeaderTemplateNone.IsChecked)
 		{
 			_viewModel.GroupHeaderTemplate = null;
@@ -225,11 +252,15 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 				});
 				return grid;
 			});
-			_viewModel.IsGroupHeaderTemplateViewSelected = true;
 		}
 	}
 	private void OnGroupFooterTemplateChanged(object sender, CheckedChangedEventArgs e)
 	{
+		if (!e.Value)
+			return;
+
+		_viewModel.IsGroupFooterTemplateViewSelected = sender == GroupFooterTemplateGrid;
+
 		if (GroupFooterTemplateNone.IsChecked)
 		{
 			_viewModel.GroupFooterTemplate = null;
@@ -256,12 +287,16 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 				});
 				return grid;
 			});
-			_viewModel.IsGroupFooterTemplateViewSelected = true;
 		}
 	}
 
 	private void OnItemTemplateChanged(object sender, CheckedChangedEventArgs e)
 	{
+		if (!e.Value)
+			return;
+
+		_viewModel.IsItemTemplateSelected = sender == ItemTemplateBasic;
+
 		if (ItemTemplateNone.IsChecked)
 		{
 			_viewModel.ItemTemplate = null;
@@ -270,16 +305,21 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 		{
 			_viewModel.ItemTemplate = new DataTemplate(() =>
 			{
-				var label = new Label();
+				var label = new Label
+				{
+					AutomationId = "DynamicItemTemplateLabel"
+				};
 				label.SetBinding(Label.TextProperty, new Binding("Caption"));
 				return label;
 			});
-			_viewModel.IsItemTemplateSelected = true;
 		}
 	}
 
 	private void OnIsGroupedChanged(object sender, CheckedChangedEventArgs e)
 	{
+		if (!e.Value)
+			return;
+
 		if (IsGroupedFalse.IsChecked)
 		{
 			_viewModel.IsGrouped = false;
@@ -294,11 +334,17 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 	{
 		if (!(sender is RadioButton radioButton) || !e.Value)
 			return;
+
+		// The shared source setter chooses a template, but this page selects it independently.
+		var itemTemplate = _viewModel.ItemTemplate;
 		if (radioButton == ItemsSourceObservableCollection5)
 			_viewModel.ItemsSourceType = ItemsSourceType.ObservableCollection5T;
 		else if (radioButton == ItemsSourceGroupedList)
 			_viewModel.ItemsSourceType = ItemsSourceType.GroupedListT;
 		else if (radioButton == ItemsSourceNone)
 			_viewModel.ItemsSourceType = ItemsSourceType.None;
+
+		if (_viewModel.ItemTemplate != itemTemplate)
+			_viewModel.ItemTemplate = itemTemplate;
 	}
 }

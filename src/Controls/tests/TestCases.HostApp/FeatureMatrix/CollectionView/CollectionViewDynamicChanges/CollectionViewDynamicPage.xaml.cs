@@ -14,8 +14,8 @@ public partial class CollectionViewDynamicPage : ContentPage
 
 	private async void NavigateToOptionsPage_Clicked(object sender, EventArgs e)
 	{
-		BindingContext = _viewModel = new CollectionViewViewModel();
-		_viewModel.ItemsSourceType = ItemsSourceType.ObservableCollection5T;
+		_viewModel.ResetDynamicProperties();
+		ResetToggleState();
 		await Navigation.PushAsync(new CollectionViewDynamicOptionsPage(_viewModel));
 	}
 
@@ -32,6 +32,22 @@ public partial class CollectionViewDynamicPage : ContentPage
 
 	private bool _isEmptyViewTemplate1 = true;
 	private bool _isItemTemplate1 = true;
+
+	private void ResetToggleState()
+	{
+		_isHeaderString1 = true;
+		_isFooterString1 = true;
+		_isFooterGrid1 = true;
+		_isHeaderGrid1 = true;
+		_isHeaderTemplate1 = true;
+		_isFooterTemplate1 = true;
+		_isGroupFooterTemplate1 = true;
+		_isGroupHeaderTemplate1 = true;
+		_isEmptyViewGrid1 = true;
+		_isEmptyViewString1 = true;
+		_isEmptyViewTemplate1 = true;
+		_isItemTemplate1 = true;
+	}
 
 	private void OnHeaderStringButtonClicked(object sender, EventArgs e)
 	{
