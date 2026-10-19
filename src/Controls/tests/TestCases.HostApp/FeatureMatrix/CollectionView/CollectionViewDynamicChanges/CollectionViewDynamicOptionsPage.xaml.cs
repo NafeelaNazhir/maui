@@ -32,7 +32,7 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 		{
 			_viewModel.EmptyView = "No Items Available(String)";
 		}
-		else
+		else if (sender == EmptyViewGrid)
 		{
 			_viewModel.EmptyView = CreateView(new Label
 			{
@@ -58,7 +58,7 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 		{
 			_viewModel.Header = "Default Header String";
 		}
-		else
+		else if (sender == HeaderGrid)
 		{
 			_viewModel.Header = CreateView(new Label
 			{
@@ -85,7 +85,7 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 		{
 			_viewModel.Footer = "Default Footer String";
 		}
-		else
+		else if (sender == FooterGrid)
 		{
 			_viewModel.Footer = CreateView(new Label
 			{
@@ -166,7 +166,7 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 		{
 			_viewModel.ItemTemplate = null;
 		}
-		else
+		else if (sender == ItemTemplateBasic)
 		{
 			_viewModel.ItemTemplate = new DataTemplate(() =>
 			{
@@ -199,7 +199,7 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 			_viewModel.ItemsSourceType = ItemsSourceType.ObservableCollection5T;
 		else if (sender == ItemsSourceGroupedList)
 			_viewModel.ItemsSourceType = ItemsSourceType.GroupedListT;
-		else
+		else if (sender == ItemsSourceNone)
 			_viewModel.ItemsSourceType = ItemsSourceType.None;
 
 		if (_viewModel.ItemTemplate != itemTemplate)
