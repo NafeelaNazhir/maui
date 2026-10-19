@@ -23,13 +23,13 @@ public class CollectionView_DynamicChangesFeatureTests : _GalleryUITest
 	{
 		ApplyOptions("ItemTemplateBasic", "ItemsSourceNone", "ItemsSourceObservableCollection");
 		App.WaitForElement("DynamicItemTemplateLabel");
-		App.WaitForElement("Apple");
+		App.WaitForElement("Banana");
 		App.WaitForElement("Orange");
 
 		WaitAndTap("ItemTemplateButton");
 		App.WaitForElement("Template 1 - Apple");
 		App.WaitForElement("Template 1 - Orange");
-		App.WaitForNoElement("Apple");
+		App.WaitForNoElement("Banana");
 		App.WaitForNoElement("Orange");
 
 		WaitAndTap("ItemTemplateButton");

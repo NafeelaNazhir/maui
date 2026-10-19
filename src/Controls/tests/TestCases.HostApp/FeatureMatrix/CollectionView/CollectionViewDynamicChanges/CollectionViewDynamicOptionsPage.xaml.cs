@@ -2,7 +2,7 @@ namespace Maui.Controls.Sample;
 
 public partial class CollectionViewDynamicOptionsPage : ContentPage
 {
-	private CollectionViewViewModel _viewModel;
+	private readonly CollectionViewViewModel _viewModel;
 
 	public CollectionViewDynamicOptionsPage(CollectionViewViewModel viewModel)
 	{
@@ -24,29 +24,21 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 		_viewModel.IsEmptyViewStringSelected = sender == EmptyViewString;
 		_viewModel.IsEmptyViewGridSelected = sender == EmptyViewGrid;
 
-		if (EmptyViewNone.IsChecked)
+		if (sender == EmptyViewNone)
 		{
 			_viewModel.EmptyView = null;
 		}
-		else if (EmptyViewString.IsChecked)
+		else if (sender == EmptyViewString)
 		{
 			_viewModel.EmptyView = "No Items Available(String)";
 		}
-		else if (EmptyViewGrid.IsChecked)
+		else
 		{
-			Grid grid = new Grid
-			{
-				BackgroundColor = Colors.LightGray,
-				Padding = new Thickness(10),
-			};
-			grid.Children.Add(new Label
+			_viewModel.EmptyView = CreateView(new Label
 			{
 				Text = "No Items Available(Grid View)",
-
 				TextColor = Colors.Blue
 			});
-			_viewModel.EmptyView = grid;
-
 		}
 	}
 
@@ -58,28 +50,22 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 		_viewModel.IsHeaderStringSelected = sender == HeaderString;
 		_viewModel.IsHeaderGridSelected = sender == HeaderGrid;
 
-		if (HeaderNone.IsChecked)
+		if (sender == HeaderNone)
 		{
 			_viewModel.Header = null;
 		}
-		else if (HeaderString.IsChecked)
+		else if (sender == HeaderString)
 		{
 			_viewModel.Header = "Default Header String";
 		}
-		else if (HeaderGrid.IsChecked)
+		else
 		{
-			Grid grid = new Grid
-			{
-				BackgroundColor = Colors.LightGray,
-				Padding = new Thickness(10)
-			};
-			grid.Children.Add(new Label
+			_viewModel.Header = CreateView(new Label
 			{
 				Text = "Default Header Grid",
 				HorizontalOptions = LayoutOptions.Center,
 				TextColor = Colors.Blue
 			});
-			_viewModel.Header = grid;
 		}
 	}
 
@@ -91,59 +77,38 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 		_viewModel.IsFooterStringSelected = sender == FooterString;
 		_viewModel.IsFooterGridSelected = sender == FooterGrid;
 
-		if (FooterNone.IsChecked)
+		if (sender == FooterNone)
 		{
 			_viewModel.Footer = null;
 		}
-		else if (FooterString.IsChecked)
+		else if (sender == FooterString)
 		{
 			_viewModel.Footer = "Default Footer String";
 		}
-		else if (FooterGrid.IsChecked)
+		else
 		{
-			Grid grid = new Grid
-			{
-				BackgroundColor = Colors.LightGray,
-				Padding = new Thickness(10)
-			};
-			grid.Children.Add(new Label
+			_viewModel.Footer = CreateView(new Label
 			{
 				Text = "Default Footer Grid",
 				HorizontalOptions = LayoutOptions.Center,
 				TextColor = Colors.Red
 			});
-			_viewModel.Footer = grid;
 		}
 	}
+
 	private void OnEmptyViewTemplateChanged(object sender, CheckedChangedEventArgs e)
 	{
 		if (!e.Value)
 			return;
 
 		_viewModel.IsEmptyViewTemplateSelected = sender == EmptyViewTemplateGrid;
-
-		if (EmptyViewTemplateNone.IsChecked)
-		{
-			_viewModel.EmptyViewTemplate = null;
-		}
-		else if (EmptyViewTemplateGrid.IsChecked)
-		{
-			_viewModel.EmptyViewTemplate = new DataTemplate(() =>
+		_viewModel.EmptyViewTemplate = _viewModel.IsEmptyViewTemplateSelected
+			? new DataTemplate(() => CreateView(new Label
 			{
-				Grid grid = new Grid
-				{
-					BackgroundColor = Colors.LightGray,
-					Padding = new Thickness(10)
-				};
-				grid.Children.Add(new Label
-				{
-					Text = "No Template Items Available(Grid View)",
-					TextColor = Colors.Blue
-				});
-				return grid;
-
-			});
-		}
+				Text = "No Template Items Available(Grid View)",
+				TextColor = Colors.Blue
+			}))
+			: null;
 	}
 
 	private void OnHeaderTemplateChanged(object sender, CheckedChangedEventArgs e)
@@ -152,35 +117,9 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 			return;
 
 		_viewModel.IsHeaderTemplateViewSelected = sender == HeaderTemplateGrid;
-
-		if (HeaderTemplateNone.IsChecked)
-		{
-			_viewModel.HeaderTemplate = null;
-
-		}
-		else if (HeaderTemplateGrid.IsChecked)
-		{
-			_viewModel.HeaderTemplate = new DataTemplate(() =>
-			{
-				Grid grid = new Grid
-				{
-					BackgroundColor = Colors.LightGray,
-					Padding = new Thickness(10)
-				};
-				grid.Children.Add(new Label
-				{
-					Text = "Default HeaderTemplate",
-					FontSize = 18,
-					FontAttributes = FontAttributes.Bold,
-					HorizontalOptions = LayoutOptions.Center,
-					VerticalOptions = LayoutOptions.Center,
-					TextColor = Colors.Blue,
-					AutomationId = "HeaderTemplateLabel"
-				});
-				return grid;
-
-			});
-		}
+		_viewModel.HeaderTemplate = _viewModel.IsHeaderTemplateViewSelected
+			? CreateTemplate("Default HeaderTemplate", Colors.Blue, "HeaderTemplateLabel")
+			: null;
 	}
 
 	private void OnFooterTemplateChanged(object sender, CheckedChangedEventArgs e)
@@ -189,33 +128,9 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 			return;
 
 		_viewModel.IsFooterTemplateViewSelected = sender == FooterTemplateGrid;
-
-		if (FooterTemplateNone.IsChecked)
-		{
-			_viewModel.FooterTemplate = null;
-		}
-		else if (FooterTemplateGrid.IsChecked)
-		{
-			_viewModel.FooterTemplate = new DataTemplate(() =>
-			{
-				Grid grid = new Grid
-				{
-					BackgroundColor = Colors.LightGray,
-					Padding = new Thickness(10)
-				};
-				grid.Children.Add(new Label
-				{
-					Text = "Default FooterTemplate",
-					FontSize = 18,
-					FontAttributes = FontAttributes.Bold,
-					HorizontalOptions = LayoutOptions.Center,
-					VerticalOptions = LayoutOptions.Center,
-					TextColor = Colors.Green,
-					AutomationId = "FooterTemplateLabel"
-				});
-				return grid;
-			});
-		}
+		_viewModel.FooterTemplate = _viewModel.IsFooterTemplateViewSelected
+			? CreateTemplate("Default FooterTemplate", Colors.Green, "FooterTemplateLabel")
+			: null;
 	}
 
 	private void OnGroupHeaderTemplateChanged(object sender, CheckedChangedEventArgs e)
@@ -224,70 +139,20 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 			return;
 
 		_viewModel.IsGroupHeaderTemplateViewSelected = sender == GroupHeaderTemplateGrid;
-
-		if (GroupHeaderTemplateNone.IsChecked)
-		{
-			_viewModel.GroupHeaderTemplate = null;
-
-
-		}
-		else if (GroupHeaderTemplateGrid.IsChecked)
-		{
-			_viewModel.GroupHeaderTemplate = new DataTemplate(() =>
-			{
-				Grid grid = new Grid
-				{
-					BackgroundColor = Colors.LightGray,
-					Padding = new Thickness(10)
-				};
-				grid.Children.Add(new Label
-				{
-					Text = "Default GroupHeaderTemplate",
-					FontSize = 18,
-					FontAttributes = FontAttributes.Bold,
-					HorizontalOptions = LayoutOptions.Center,
-					VerticalOptions = LayoutOptions.Center,
-					TextColor = Colors.Green,
-					AutomationId = "GroupHeaderTemplateLabel"
-				});
-				return grid;
-			});
-		}
+		_viewModel.GroupHeaderTemplate = _viewModel.IsGroupHeaderTemplateViewSelected
+			? CreateTemplate("Default GroupHeaderTemplate", Colors.Green, "GroupHeaderTemplateLabel")
+			: null;
 	}
+
 	private void OnGroupFooterTemplateChanged(object sender, CheckedChangedEventArgs e)
 	{
 		if (!e.Value)
 			return;
 
 		_viewModel.IsGroupFooterTemplateViewSelected = sender == GroupFooterTemplateGrid;
-
-		if (GroupFooterTemplateNone.IsChecked)
-		{
-			_viewModel.GroupFooterTemplate = null;
-
-		}
-		else if (GroupFooterTemplateGrid.IsChecked)
-		{
-			_viewModel.GroupFooterTemplate = new DataTemplate(() =>
-			{
-				Grid grid = new Grid
-				{
-					BackgroundColor = Colors.LightGray,
-					Padding = new Thickness(10)
-				};
-				grid.Children.Add(new Label
-				{
-					Text = "Default GroupFooterTemplate",
-					FontSize = 18,
-					FontAttributes = FontAttributes.Bold,
-					HorizontalOptions = LayoutOptions.Center,
-					VerticalOptions = LayoutOptions.Center,
-					TextColor = Colors.Red,
-					AutomationId = "GroupFooterTemplateLabel"
-				});
-				return grid;
-			});
-		}
+		_viewModel.GroupFooterTemplate = _viewModel.IsGroupFooterTemplateViewSelected
+			? CreateTemplate("Default GroupFooterTemplate", Colors.Red, "GroupFooterTemplateLabel")
+			: null;
 	}
 
 	private void OnItemTemplateChanged(object sender, CheckedChangedEventArgs e)
@@ -297,11 +162,11 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 
 		_viewModel.IsItemTemplateSelected = sender == ItemTemplateBasic;
 
-		if (ItemTemplateNone.IsChecked)
+		if (sender == ItemTemplateNone)
 		{
 			_viewModel.ItemTemplate = null;
 		}
-		else if (ItemTemplateBasic.IsChecked)
+		else
 		{
 			_viewModel.ItemTemplate = new DataTemplate(() =>
 			{
@@ -320,31 +185,49 @@ public partial class CollectionViewDynamicOptionsPage : ContentPage
 		if (!e.Value)
 			return;
 
-		if (IsGroupedFalse.IsChecked)
-		{
-			_viewModel.IsGrouped = false;
-		}
-		else if (IsGroupedTrue.IsChecked)
-		{
-			_viewModel.IsGrouped = true;
-		}
+		_viewModel.IsGrouped = sender == IsGroupedTrue;
 	}
 
 	private void OnItemsSourceChanged(object sender, CheckedChangedEventArgs e)
 	{
-		if (!(sender is RadioButton radioButton) || !e.Value)
+		if (!e.Value)
 			return;
 
 		// The shared source setter chooses a template, but this page selects it independently.
 		var itemTemplate = _viewModel.ItemTemplate;
-		if (radioButton == ItemsSourceObservableCollection5)
+		if (sender == ItemsSourceObservableCollection5)
 			_viewModel.ItemsSourceType = ItemsSourceType.ObservableCollection5T;
-		else if (radioButton == ItemsSourceGroupedList)
+		else if (sender == ItemsSourceGroupedList)
 			_viewModel.ItemsSourceType = ItemsSourceType.GroupedListT;
-		else if (radioButton == ItemsSourceNone)
+		else
 			_viewModel.ItemsSourceType = ItemsSourceType.None;
 
 		if (_viewModel.ItemTemplate != itemTemplate)
 			_viewModel.ItemTemplate = itemTemplate;
+	}
+
+	private static DataTemplate CreateTemplate(string text, Color textColor, string automationId)
+	{
+		return new DataTemplate(() => CreateView(new Label
+		{
+			Text = text,
+			TextColor = textColor,
+			AutomationId = automationId,
+			FontSize = 18,
+			FontAttributes = FontAttributes.Bold,
+			HorizontalOptions = LayoutOptions.Center,
+			VerticalOptions = LayoutOptions.Center
+		}));
+	}
+
+	private static Grid CreateView(Label label)
+	{
+		var grid = new Grid
+		{
+			BackgroundColor = Colors.LightGray,
+			Padding = new Thickness(10)
+		};
+		grid.Children.Add(label);
+		return grid;
 	}
 }
