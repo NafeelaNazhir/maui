@@ -129,21 +129,7 @@ public class CollectionViewViewModel : INotifyPropertyChanged
 
 		AddItemCommand = new Command(AddItem);
 
-		GroupHeaderTemplate = new DataTemplate(() =>
-		{
-			var stackLayout = new StackLayout
-			{
-				BackgroundColor = Colors.LightGray
-			};
-			var label = new Label
-			{
-				FontAttributes = FontAttributes.Bold,
-				FontSize = 24,
-			};
-			label.SetBinding(Label.TextProperty, "Key");
-			stackLayout.Children.Add(label);
-			return stackLayout;
-		});
+		GroupHeaderTemplate = CreateDefaultGroupHeaderTemplate();
 
 		SetItemTemplate();
 		SelectedItems = new ObservableCollection<object>();
@@ -652,21 +638,7 @@ public class CollectionViewViewModel : INotifyPropertyChanged
 		EmptyViewTemplate = null;
 		HeaderTemplate = null;
 		FooterTemplate = null;
-		GroupHeaderTemplate = new DataTemplate(() =>
-		{
-			var stackLayout = new StackLayout
-			{
-				BackgroundColor = Colors.LightGray
-			};
-			var label = new Label
-			{
-				FontAttributes = FontAttributes.Bold,
-				FontSize = 24,
-			};
-			label.SetBinding(Label.TextProperty, "Key");
-			stackLayout.Children.Add(label);
-			return stackLayout;
-		});
+		GroupHeaderTemplate = CreateDefaultGroupHeaderTemplate();
 		GroupFooterTemplate = null;
 		IsHeaderStringSelected = false;
 		IsFooterStringSelected = false;
@@ -682,6 +654,25 @@ public class CollectionViewViewModel : INotifyPropertyChanged
 		IsItemTemplateSelected = false;
 
 		ItemsSourceType = ItemsSourceType.ObservableCollection5T;
+	}
+
+	private static DataTemplate CreateDefaultGroupHeaderTemplate()
+	{
+		return new DataTemplate(() =>
+		{
+			var stackLayout = new StackLayout
+			{
+				BackgroundColor = Colors.LightGray
+			};
+			var label = new Label
+			{
+				FontAttributes = FontAttributes.Bold,
+				FontSize = 24,
+			};
+			label.SetBinding(Label.TextProperty, "Key");
+			stackLayout.Children.Add(label);
+			return stackLayout;
+		});
 	}
 
 	private void LoadItems(bool isScrollingFeatureTest = false)
