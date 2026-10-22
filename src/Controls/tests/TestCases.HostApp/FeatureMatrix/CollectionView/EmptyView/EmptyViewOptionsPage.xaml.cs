@@ -1,278 +1,281 @@
-using System;
-using System.Collections.ObjectModel;
-using Maui.Controls.Sample.CollectionViewGalleries;
-using Microsoft.Maui.Controls;
+namespace Maui.Controls.Sample;
 
-namespace Maui.Controls.Sample
+public partial class EmptyViewOptionsPage : ContentPage
 {
-	public partial class EmptyViewOptionsPage : ContentPage
+	private readonly CollectionViewViewModel _viewModel;
+
+	public EmptyViewOptionsPage(CollectionViewViewModel viewModel)
 	{
-		private CollectionViewViewModel _viewModel;
+		_viewModel = viewModel;
+		InitializeComponent();
+		BindingContext = _viewModel;
+	}
 
-		public EmptyViewOptionsPage(CollectionViewViewModel viewModel)
+	private async void ApplyButton_Clicked(object sender, EventArgs e)
+	{
+		await Navigation.PopAsync();
+	}
+
+	private void OnEmptyViewChanged(object sender, CheckedChangedEventArgs e)
+	{
+		if (!e.Value)
+			return;
+
+		if (sender == EmptyViewNone)
 		{
-			InitializeComponent();
-			_viewModel = viewModel;
-			BindingContext = _viewModel;
+			_viewModel.EmptyView = null;
 		}
-
-		private void ApplyButton_Clicked(object sender, EventArgs e)
+		else if (sender == EmptyViewString)
 		{
-			Navigation.PopAsync();
+			_viewModel.EmptyView = "No Items Available(String)";
 		}
-
-		private void OnEmptyViewChanged(object sender, CheckedChangedEventArgs e)
+		else if (sender == EmptyViewGrid)
 		{
-			if (EmptyViewNone.IsChecked)
+			_viewModel.EmptyView = CreateView(new Label
 			{
-				_viewModel.EmptyView = null;
-			}
-			else if (EmptyViewString.IsChecked)
+				Text = "No Items Available(Grid View)",
+				VerticalOptions = LayoutOptions.Center,
+				TextColor = Colors.Blue
+			});
+		}
+		else if (sender == EmptyViewCustomSize)
+		{
+			_viewModel.EmptyView = CreateSizedView("Custom Empty View (Sized)", "EmptyViewLabel");
+		}
+	}
+
+	private void OnHeaderChanged(object sender, CheckedChangedEventArgs e)
+	{
+		if (!e.Value)
+			return;
+
+		if (sender == HeaderNone)
+		{
+			_viewModel.Header = null;
+		}
+		else if (sender == HeaderString)
+		{
+			_viewModel.Header = "CollectionView Header(String)";
+		}
+		else if (sender == HeaderGrid)
+		{
+			_viewModel.Header = CreateHeaderFooterView("CollectionView Header(Grid View)", Colors.Blue);
+		}
+	}
+
+	private void OnFooterChanged(object sender, CheckedChangedEventArgs e)
+	{
+		if (!e.Value)
+			return;
+
+		if (sender == FooterNone)
+		{
+			_viewModel.Footer = null;
+		}
+		else if (sender == FooterString)
+		{
+			_viewModel.Footer = "CollectionView Footer(String)";
+		}
+		else if (sender == FooterGrid)
+		{
+			_viewModel.Footer = CreateHeaderFooterView("CollectionView Footer(Grid View)", Colors.Red);
+		}
+	}
+
+	private void OnEmptyViewTemplateChanged(object sender, CheckedChangedEventArgs e)
+	{
+		if (!e.Value)
+			return;
+
+		if (sender == EmptyViewTemplateNone)
+		{
+			_viewModel.EmptyViewTemplate = null;
+		}
+		else if (sender == EmptyViewTemplateGrid)
+		{
+			_viewModel.EmptyViewTemplate = new DataTemplate(() => CreateView(new Label
 			{
-				_viewModel.EmptyView = "No Items Available(String)";
-			}
-			else if (EmptyViewGrid.IsChecked)
+				Text = "No Template Items Available(Grid View)",
+				VerticalOptions = LayoutOptions.Center,
+				TextColor = Colors.Blue
+			}));
+		}
+		else if (sender == EmptyViewTemplateCustomSize)
+		{
+			_viewModel.EmptyViewTemplate = new DataTemplate(() =>
+				CreateSizedView("Custom EmptyViewTemplate (Sized)", "EmptyViewTemplateLabel", Colors.Green));
+		}
+	}
+
+	private void OnItemTemplateChanged(object sender, CheckedChangedEventArgs e)
+	{
+		if (!e.Value)
+			return;
+
+		if (sender == ItemTemplateNone)
+		{
+			_viewModel.ItemTemplate = null;
+		}
+		else if (sender == ItemTemplateBasic)
+		{
+			_viewModel.ItemTemplate = new DataTemplate(CreateItemLabel);
+		}
+		else if (sender == ItemTemplateGrid)
+		{
+			_viewModel.ItemTemplate = new DataTemplate(() =>
 			{
-				Grid grid = new Grid
+				var grid = new Grid
 				{
-					BackgroundColor = Colors.LightGray,
+					ColumnDefinitions =
+					{
+						new ColumnDefinition { Width = GridLength.Star },
+						new ColumnDefinition { Width = GridLength.Star }
+					},
 					Padding = new Thickness(10),
+					BackgroundColor = Colors.LightBlue
 				};
-				grid.Children.Add(new Label
-				{
-					Text = "No Items Available(Grid View)",
-					VerticalOptions = LayoutOptions.Center,
-					TextColor = Colors.Blue
-				});
-				_viewModel.EmptyView = grid;
-			}
-			else if (EmptyViewCustomSize.IsChecked)
-			{
-				Frame customView = new Frame
-				{
-					BackgroundColor = Colors.LightBlue,
-					HeightRequest = 200,
-					AutomationId = "EmptyViewLabel",
-					WidthRequest = 300,
-					HorizontalOptions = LayoutOptions.Center,
-					VerticalOptions = LayoutOptions.Center,
-					Content = new Label
-					{
-						Text = "Custom Empty View (Sized)",
-						VerticalOptions = LayoutOptions.Center,
-					}
-				};
-				_viewModel.EmptyView = customView;
-			}
-		}
 
-		private void OnHeaderChanged(object sender, CheckedChangedEventArgs e)
+				var label = CreateItemLabel();
+				label.VerticalOptions = LayoutOptions.Center;
+				label.HorizontalOptions = LayoutOptions.Start;
+				label.FontAttributes = FontAttributes.Bold;
+				label.TextColor = Colors.Green;
+				grid.Children.Add(label);
+				return grid;
+			});
+		}
+	}
+
+	private void OnIsGroupedChanged(object sender, CheckedChangedEventArgs e)
+	{
+		if (!e.Value)
+			return;
+
+		if (sender == IsGroupedFalse)
 		{
-			if (HeaderNone.IsChecked)
-			{
-				_viewModel.Header = null;
-			}
-			else if (HeaderString.IsChecked)
-			{
-				_viewModel.Header = "CollectionView Header(String)";
-			}
-			else if (HeaderGrid.IsChecked)
-			{
-				Grid grid = new Grid
-				{
-					BackgroundColor = Colors.LightGray,
-					Padding = new Thickness(10)
-				};
-				grid.Children.Add(new Label
-				{
-					Text = "CollectionView Header(Grid View)",
-					HorizontalOptions = LayoutOptions.Center,
-					TextColor = Colors.Blue
-				});
-				_viewModel.Header = grid;
-			}
+			_viewModel.IsGrouped = false;
 		}
-
-		private void OnFooterChanged(object sender, CheckedChangedEventArgs e)
+		else if (sender == IsGroupedTrue)
 		{
-			if (FooterNone.IsChecked)
-			{
-				_viewModel.Footer = null;
-			}
-			else if (FooterString.IsChecked)
-			{
-				_viewModel.Footer = "CollectionView Footer(String)";
-			}
-			else if (FooterGrid.IsChecked)
-			{
-				Grid grid = new Grid
-				{
-					BackgroundColor = Colors.LightGray,
-					Padding = new Thickness(10)
-				};
-				grid.Children.Add(new Label
-				{
-					Text = "CollectionView Footer(Grid View)",
-					HorizontalOptions = LayoutOptions.Center,
-					TextColor = Colors.Red
-				});
-				_viewModel.Footer = grid;
-			}
+			_viewModel.IsGrouped = true;
 		}
+	}
 
-		private void OnEmptyViewTemplateChanged(object sender, CheckedChangedEventArgs e)
+	private void OnItemsSourceChanged(object sender, CheckedChangedEventArgs e)
+	{
+		if (!e.Value)
+			return;
+
+		if (sender == ItemsSourceObservableCollection5)
 		{
-			if (EmptyViewTemplateNone.IsChecked)
-			{
-				_viewModel.EmptyViewTemplate = null;
-			}
-			else if (EmptyViewTemplateGrid.IsChecked)
-			{
-				_viewModel.EmptyViewTemplate = new DataTemplate(() =>
-				{
-					Grid grid = new Grid
-					{
-						BackgroundColor = Colors.LightGray,
-						Padding = new Thickness(10)
-					};
-					grid.Children.Add(new Label
-					{
-						Text = "No Template Items Available(Grid View)",
-						VerticalOptions = LayoutOptions.Center,
-						TextColor = Colors.Blue
-					});
-					return grid;
-				});
-			}
-			else if (EmptyViewTemplateCustomSize.IsChecked)
-			{
-				_viewModel.EmptyViewTemplate = new DataTemplate(() =>
-				{
-					Frame customView = new Frame
-					{
-						BackgroundColor = Colors.LightBlue,
-						HeightRequest = 200,
-						BorderColor = Colors.Green,
-						AutomationId = "EmptyViewTemplateLabel",
-						WidthRequest = 300,
-						HorizontalOptions = LayoutOptions.Center,
-						VerticalOptions = LayoutOptions.Center,
-						Content = new Label
-						{
-							Text = "Custom EmptyViewTemplate (Sized)",
-							VerticalOptions = LayoutOptions.Center,
-						}
-					};
-					return customView;
-				});
-			}
+			_viewModel.ItemsSourceType = ItemsSourceType.ObservableCollection5T;
 		}
-
-		private void OnItemTemplateChanged(object sender, CheckedChangedEventArgs e)
+		else if (sender == ItemsSourceEmptyObservableCollection)
 		{
-			if (ItemTemplateNone.IsChecked)
-			{
-				_viewModel.ItemTemplate = null;
-			}
-			else if (ItemTemplateBasic.IsChecked)
-			{
-				_viewModel.ItemTemplate = new DataTemplate(() =>
-				{
-					var label = new Label();
-					label.SetBinding(Label.TextProperty, new Binding("Caption"));
-					return label;
-				});
-			}
-			else if (ItemTemplateGrid.IsChecked)
-			{
-				_viewModel.ItemTemplate = new DataTemplate(() =>
-				{
-					var grid = new Grid
-					{
-						ColumnDefinitions =
-						{
-							 new ColumnDefinition { Width = GridLength.Star },
-							 new ColumnDefinition { Width = GridLength.Star }
-						},
-						Padding = new Thickness(10),
-						BackgroundColor = Colors.LightBlue
-
-					};
-
-					var label1 = new Label
-					{
-						VerticalOptions = LayoutOptions.Center,
-						HorizontalOptions = LayoutOptions.Start,
-						FontAttributes = FontAttributes.Bold,
-						TextColor = Colors.Green
-					};
-					label1.SetBinding(Label.TextProperty, "Caption");
-					grid.Children.Add(label1);
-					return grid;
-				});
-			}
+			_viewModel.ItemsSourceType = ItemsSourceType.EmptyObservableCollectionT;
 		}
-
-		private void OnIsGroupedChanged(object sender, CheckedChangedEventArgs e)
+		else if (sender == ItemsSourceGroupedList)
 		{
-			if (IsGroupedFalse.IsChecked)
-			{
-				_viewModel.IsGrouped = false;
-			}
-			else if (IsGroupedTrue.IsChecked)
-			{
-				_viewModel.IsGrouped = true;
-			}
+			_viewModel.ItemsSourceType = ItemsSourceType.GroupedListT;
 		}
-
-		private void OnItemsSourceChanged(object sender, CheckedChangedEventArgs e)
+		else if (sender == ItemsSourceEmptyGroupedList)
 		{
-			if (!(sender is RadioButton radioButton) || !e.Value)
-				return;
-			// Set IsGrouped based on selection
-
-			if (radioButton == ItemsSourceObservableCollection5)
-				_viewModel.ItemsSourceType = ItemsSourceType.ObservableCollection5T;
-			else if (radioButton == ItemsSourceEmptyObservableCollection)
-				_viewModel.ItemsSourceType = ItemsSourceType.EmptyObservableCollectionT;
-			else if (radioButton == ItemsSourceGroupedList)
-				_viewModel.ItemsSourceType = ItemsSourceType.GroupedListT;
-			else if (radioButton == ItemsSourceEmptyGroupedList)
-				_viewModel.ItemsSourceType = ItemsSourceType.EmptyGroupedListT;
-			else if (radioButton == ItemsSourceNone)
-				_viewModel.ItemsSourceType = ItemsSourceType.None;
+			_viewModel.ItemsSourceType = ItemsSourceType.EmptyGroupedListT;
 		}
-
-		private void OnItemsLayoutChanged(object sender, CheckedChangedEventArgs e)
+		else if (sender == ItemsSourceNone)
 		{
-			if (ItemsLayoutVerticalList.IsChecked)
+			_viewModel.ItemsSourceType = ItemsSourceType.None;
+		}
+	}
+
+	private void OnItemsLayoutChanged(object sender, CheckedChangedEventArgs e)
+	{
+		if (!e.Value)
+			return;
+
+		if (sender == ItemsLayoutVerticalList)
+		{
+			_viewModel.ItemsLayout = new LinearItemsLayout(ItemsLayoutOrientation.Vertical);
+		}
+		else if (sender == ItemsLayoutHorizontalList)
+		{
+			_viewModel.ItemsLayout = new LinearItemsLayout(ItemsLayoutOrientation.Horizontal);
+		}
+		else if (sender == ItemsLayoutVerticalGrid)
+		{
+			_viewModel.ItemsLayout = new GridItemsLayout(2, ItemsLayoutOrientation.Vertical);
+		}
+		else if (sender == ItemsLayoutHorizontalGrid)
+		{
+			_viewModel.ItemsLayout = new GridItemsLayout(2, ItemsLayoutOrientation.Horizontal);
+		}
+	}
+
+	private void OnFlowDirectionChanged(object sender, CheckedChangedEventArgs e)
+	{
+		if (!e.Value)
+			return;
+
+		if (sender == FlowDirectionLeftToRight)
+		{
+			_viewModel.FlowDirection = FlowDirection.LeftToRight;
+		}
+		else if (sender == FlowDirectionRightToLeft)
+		{
+			_viewModel.FlowDirection = FlowDirection.RightToLeft;
+		}
+	}
+
+	private static Grid CreateHeaderFooterView(string text, Color textColor)
+	{
+		return CreateView(new Label
+		{
+			Text = text,
+			HorizontalOptions = LayoutOptions.Center,
+			TextColor = textColor
+		});
+	}
+
+	private static Grid CreateView(Label label)
+	{
+		var grid = new Grid
+		{
+			BackgroundColor = Colors.LightGray,
+			Padding = new Thickness(10)
+		};
+		grid.Children.Add(label);
+		return grid;
+	}
+
+	private static Frame CreateSizedView(string text, string automationId, Color borderColor = null)
+	{
+		var view = new Frame
+		{
+			BackgroundColor = Colors.LightBlue,
+			HeightRequest = 200,
+			WidthRequest = 300,
+			AutomationId = automationId,
+			HorizontalOptions = LayoutOptions.Center,
+			VerticalOptions = LayoutOptions.Center,
+			Content = new Label
 			{
-				_viewModel.ItemsLayout = new LinearItemsLayout(ItemsLayoutOrientation.Vertical);
+				Text = text,
+				VerticalOptions = LayoutOptions.Center
 			}
-			else if (ItemsLayoutHorizontalList.IsChecked)
-			{
-				_viewModel.ItemsLayout = new LinearItemsLayout(ItemsLayoutOrientation.Horizontal);
-			}
-			else if (ItemsLayoutVerticalGrid.IsChecked)
-			{
-				_viewModel.ItemsLayout = new GridItemsLayout(2, ItemsLayoutOrientation.Vertical); // 2 columns
-			}
-			else if (ItemsLayoutHorizontalGrid.IsChecked)
-			{
-				_viewModel.ItemsLayout = new GridItemsLayout(2, ItemsLayoutOrientation.Horizontal); // 2 rows
-			}
+		};
+
+		if (borderColor is not null)
+		{
+			view.BorderColor = borderColor;
 		}
 
-		private void OnFlowDirectionChanged(object sender, CheckedChangedEventArgs e)
-		{
-			if (FlowDirectionLeftToRight.IsChecked)
-			{
-				_viewModel.FlowDirection = FlowDirection.LeftToRight;
-			}
-			else if (FlowDirectionRightToLeft.IsChecked)
-			{
-				_viewModel.FlowDirection = FlowDirection.RightToLeft;
-			}
-		}
+		return view;
+	}
+
+	private static Label CreateItemLabel()
+	{
+		var label = new Label();
+		label.SetBinding(Label.TextProperty, new Binding("Caption"));
+		return label;
 	}
 }
