@@ -19,16 +19,57 @@ namespace Microsoft.Maui.TestCases.Tests
 		{
 		}
 
+		void ApplyOptions(params string[] optionIds)
+		{
+			App.WaitForElement("Options");
+			App.Tap("Options");
+
+			foreach (var optionId in optionIds)
+			{
+				App.WaitForElement(optionId);
+				App.Tap(optionId);
+			}
+
+			App.WaitForElement("Apply");
+			App.Tap("Apply");
+		}
+
+		void ScrollToAndWaitForFooter(string footer, bool isHorizontal)
+		{
+			if (isHorizontal)
+				App.ScrollRight("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
+			else
+				App.ScrollDown("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
+
+			App.WaitForElement(footer);
+		}
+
+		void AssertEmptyViewSize(string automationId)
+		{
+			var scale = App switch
+			{
+				AppiumAndroidApp => App.GetDisplayDensity(),
+				// The HostApp uses Catalyst's iPad idiom, which scales UIKit points to 77%.
+				// https://developer.apple.com/videos/play/wwdc2020/10143/
+				AppiumCatalystApp => 0.77,
+				_ => 1.0
+			};
+
+			App.RetryAssert(() =>
+			{
+				var bounds = App.WaitForElement(automationId).GetRect();
+				Assert.That(bounds.Width, Is.EqualTo(300 * scale).Within(5),
+					$"{automationId} should have a width of 300 logical units (native scale: {scale}).");
+				Assert.That(bounds.Height, Is.EqualTo(200 * scale).Within(5),
+					$"{automationId} should have a height of 200 logical units (native scale: {scale}).");
+			});
+		}
+
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateEmptyViewStringDisplayed()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString");
 			App.WaitForElement("No Items Available(String)");
 		}
 
@@ -36,12 +77,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 		public void ValidateCustomEmptyViewDisplayed()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid");
 			App.WaitForElement("No Items Available(Grid View)");
 		}
 
@@ -49,12 +85,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void ValidateCustomEmptyViewSizeDisplayed()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize");
 			App.WaitForElement("Custom Empty View (Sized)");
 		}
 
@@ -62,14 +93,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 		public void ValidateEmptyViewStringDisplayed_AndItemSourceEmptyObservableCollectionSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceEmptyObservableCollection");
-			App.Tap("ItemsSourceEmptyObservableCollection");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceEmptyObservableCollection", "EmptyViewString");
 			App.WaitForElement("No Items Available(String)");
 		}
 
@@ -77,14 +101,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateEmptyViewStringSetFirst_AndEmptyObservableCollection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("ItemsSourceEmptyObservableCollection");
-			App.Tap("ItemsSourceEmptyObservableCollection");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "ItemsSourceEmptyObservableCollection");
 			App.WaitForElement("No Items Available(String)");
 		}
 
@@ -92,14 +109,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewStringDisplayed_AndObservableCollectionSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceObservableCollection");
-			App.Tap("ItemsSourceObservableCollection");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceObservableCollection", "EmptyViewString");
 			App.WaitForNoElement("No Items Available(String)");
 		}
 
@@ -107,14 +117,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 		public void ValidateEmptyViewStringSetFirst_AndObservableCollection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("ItemsSourceObservableCollection");
-			App.Tap("ItemsSourceObservableCollection");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "ItemsSourceObservableCollection");
 			App.WaitForNoElement("No Items Available(String)");
 		}
 
@@ -122,14 +125,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateEmptyViewStringDisplayed_AndEmptyGroupedListSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceEmptyGroupedList");
-			App.Tap("ItemsSourceEmptyGroupedList");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceEmptyGroupedList", "EmptyViewString");
 			App.WaitForElement("No Items Available(String)");
 		}
 
@@ -137,14 +133,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateEmptyViewStringDisplayedSetFirst_AndItemSourceEmptyGroupedList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("ItemsSourceEmptyGroupedList");
-			App.Tap("ItemsSourceEmptyGroupedList");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "ItemsSourceEmptyGroupedList");
 			App.WaitForElement("No Items Available(String)");
 		}
 
@@ -152,16 +141,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateEmptyViewStringDisplayed_GroupedListSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceGroupedList");
-			App.Tap("ItemsSourceGroupedList");
-			App.WaitForElement("IsGroupedTrue");
-			App.Tap("IsGroupedTrue");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceGroupedList", "IsGroupedTrue", "EmptyViewString");
 			App.WaitForNoElement("No Items Available(String)");
 		}
 
@@ -169,66 +149,15 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 		public void ValidateEmptyViewStringDisplayedSetFirst_AndGroupedList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("ItemsSourceGroupedList");
-			App.Tap("ItemsSourceGroupedList");
-			App.WaitForElement("IsGroupedTrue");
-			App.Tap("IsGroupedTrue");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "ItemsSourceGroupedList", "IsGroupedTrue");
 			App.WaitForNoElement("No Items Available(String)");
 		}
-
-#if TEST_FAILS_ON_ANDROID && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS && TEST_FAILS_ON_WINDOWS // Issue Link - https://github.com/dotnet/maui/issues/32404
-
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
-		public void VerifyEmptyViewStringDisplaysCorrectly_WithLeftToRightFlowDirection()
-		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("FlowDirectionLeftToRight");
-			App.Tap("FlowDirectionLeftToRight");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
-			App.WaitForElement("No Items Available(String)");
-			VerifyScreenshot();
-		}
-
-		[Test]
-		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
-		public void VerifyEmptyViewStringDisplaysCorrectly_WithRightToLeftFlowDirection()
-		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("FlowDirectionRightToLeft");
-			App.Tap("FlowDirectionRightToLeft");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
-			App.WaitForElement("No Items Available(String)");
-			VerifyScreenshot();
-		}
-#endif
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void VerifyCustomEmptyViewDisplaysCorrectly_WithLeftToRightFlowDirection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("FlowDirectionLeftToRight");
-			App.Tap("FlowDirectionLeftToRight");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "FlowDirectionLeftToRight");
 			App.WaitForElement("No Items Available(Grid View)");
 			VerifyScreenshot();
 		}
@@ -237,14 +166,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 		public void VerifyCustomEmptyViewDisplaysCorrectly_WithRightToLeftFlowDirection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("FlowDirectionRightToLeft");
-			App.Tap("FlowDirectionRightToLeft");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "FlowDirectionRightToLeft");
 			App.WaitForElement("No Items Available(Grid View)");
 			VerifyScreenshot();
 		}
@@ -253,14 +175,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void VerifyCustomSizedEmptyViewDisplaysCorrectly_WithLeftToRightFlowDirection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("FlowDirectionLeftToRight");
-			App.Tap("FlowDirectionLeftToRight");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "FlowDirectionLeftToRight");
 			App.WaitForElement("Custom Empty View (Sized)");
 			VerifyScreenshot();
 		}
@@ -269,14 +184,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 		public void VerifyCustomSizedEmptyViewDisplaysCorrectly_WithRightToLeftFlowDirection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("FlowDirectionRightToLeft");
-			App.Tap("FlowDirectionRightToLeft");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "FlowDirectionRightToLeft");
 			App.WaitForElement("Custom Empty View (Sized)");
 			VerifyScreenshot();
 		}
@@ -285,14 +193,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateCustomEmptyViewDisplayed_AndEmptyObservableCollectionSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceEmptyObservableCollection");
-			App.Tap("ItemsSourceEmptyObservableCollection");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceEmptyObservableCollection", "EmptyViewGrid");
 			App.WaitForElement("No Items Available(Grid View)");
 		}
 
@@ -300,14 +201,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void ValidateCustomEmptyViewDisplayedSetFirst_AndEmptyObservableCollection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("ItemsSourceEmptyObservableCollection");
-			App.Tap("ItemsSourceEmptyObservableCollection");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "ItemsSourceEmptyObservableCollection");
 			App.WaitForElement("No Items Available(Grid View)");
 		}
 
@@ -315,14 +209,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void ValidateCustomEmptyViewDisplayed_AndObservableCollectionSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceObservableCollection");
-			App.Tap("ItemsSourceObservableCollection");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceObservableCollection", "EmptyViewGrid");
 			App.WaitForNoElement("No Items Available(Grid View)");
 		}
 
@@ -330,14 +217,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 		public void ValidateCustomEmptyViewDisplayedSetFirst_AndObservableCollection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("ItemsSourceObservableCollection");
-			App.Tap("ItemsSourceObservableCollection");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "ItemsSourceObservableCollection");
 			App.WaitForNoElement("No Items Available(Grid View)");
 		}
 
@@ -345,14 +225,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void ValidateCustomEmptyViewDisplayed_EmptyGroupedListSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceEmptyGroupedList");
-			App.Tap("ItemsSourceEmptyGroupedList");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceEmptyGroupedList", "EmptyViewGrid");
 			App.WaitForElement("No Items Available(Grid View)");
 		}
 
@@ -360,14 +233,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 		public void ValidateCustomEmptyViewDisplayedSetFirst_AndEmptyGroupedList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("ItemsSourceEmptyGroupedList");
-			App.Tap("ItemsSourceEmptyGroupedList");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "ItemsSourceEmptyGroupedList");
 			App.WaitForElement("No Items Available(Grid View)");
 		}
 
@@ -375,16 +241,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateCustomEmptyViewDisplayed_GroupedListSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceGroupedList");
-			App.Tap("ItemsSourceGroupedList");
-			App.WaitForElement("IsGroupedTrue");
-			App.Tap("IsGroupedTrue");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceGroupedList", "IsGroupedTrue", "EmptyViewGrid");
 			App.WaitForNoElement("No Items Available(Grid View)");
 		}
 
@@ -392,16 +249,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void ValidateCustomEmptyViewDisplayedSetFirst_AndGroupedList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("ItemsSourceGroupedList");
-			App.Tap("ItemsSourceGroupedList");
-			App.WaitForElement("IsGroupedTrue");
-			App.Tap("IsGroupedTrue");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "ItemsSourceGroupedList", "IsGroupedTrue");
 			App.WaitForNoElement("No Items Available(Grid View)");
 		}
 
@@ -409,14 +257,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomEmptyViewSizeDisplayed_AndEmptyObservableCollectionSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceEmptyObservableCollection");
-			App.Tap("ItemsSourceEmptyObservableCollection");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceEmptyObservableCollection", "EmptyViewCustomSize");
 			App.WaitForElement("Custom Empty View (Sized)");
 		}
 
@@ -424,14 +265,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateCustomEmptyViewSizeDisplayedSetFirst_AndEmptyObservableCollection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("ItemsSourceEmptyObservableCollection");
-			App.Tap("ItemsSourceEmptyObservableCollection");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "ItemsSourceEmptyObservableCollection");
 			App.WaitForElement("Custom Empty View (Sized)");
 		}
 
@@ -439,14 +273,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateCustomEmptyViewSizeDisplayed_AndObservableCollectionSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceObservableCollection");
-			App.Tap("ItemsSourceObservableCollection");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceObservableCollection", "EmptyViewCustomSize");
 			App.WaitForNoElement("Custom Empty View (Sized)");
 		}
 
@@ -454,14 +281,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void ValidateCustomEmptyViewSizeDisplayedSetFirst_AndObservableCollection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("ItemsSourceObservableCollection");
-			App.Tap("ItemsSourceObservableCollection");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "ItemsSourceObservableCollection");
 			App.WaitForNoElement("Custom Empty View (Sized)");
 		}
 
@@ -469,14 +289,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void ValidateCustomEmptyViewSizeDisplayed_EmptyGroupedListSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceEmptyGroupedList");
-			App.Tap("ItemsSourceEmptyGroupedList");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceEmptyGroupedList", "EmptyViewCustomSize");
 			App.WaitForElement("Custom Empty View (Sized)");
 		}
 
@@ -484,14 +297,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 		public void ValidateCustomEmptyViewSizeDisplayedSetFirst_AndEmptyGroupedList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("ItemsSourceEmptyGroupedList");
-			App.Tap("ItemsSourceEmptyGroupedList");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "ItemsSourceEmptyGroupedList");
 			App.WaitForElement("Custom Empty View (Sized)");
 		}
 
@@ -499,14 +305,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void ValidateCustomEmptyViewSizeDisplayed_GroupedListSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceGroupedList");
-			App.Tap("ItemsSourceGroupedList");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceGroupedList", "IsGroupedTrue", "EmptyViewCustomSize");
 			App.WaitForNoElement("Custom Empty View (Sized)");
 		}
 
@@ -514,14 +313,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 		public void ValidateCustomEmptyViewSizeDisplayedSetFirst_AndGroupedList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("ItemsSourceGroupedList");
-			App.Tap("ItemsSourceGroupedList");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "ItemsSourceGroupedList", "IsGroupedTrue");
 			App.WaitForNoElement("Custom Empty View (Sized)");
 		}
 
@@ -529,14 +321,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateEmptyViewStringDisplayed_AndEmptyViewTemplate()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "EmptyViewTemplateGrid");
 			App.WaitForElement("No Template Items Available(Grid View)");
 		}
 
@@ -544,14 +329,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomEmptyViewDisplayed_AndEmptyViewTemplate()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "EmptyViewTemplateGrid");
 			App.WaitForElement("No Template Items Available(Grid View)");
 		}
 
@@ -559,14 +337,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 		public void ValidateCustomEmptyViewSizeDisplayed_AndEmptyViewTemplate()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "EmptyViewTemplateGrid");
 			App.WaitForElement("No Template Items Available(Grid View)");
 		}
 
@@ -574,14 +345,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 		public void ValidateCustomEmptyViewSizeDisplayed_AndCustomEmptyViewTemplateSize()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "EmptyViewTemplateCustomSize");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 		}
 
@@ -589,14 +353,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 		public void ValidateEmptyViewStringDisplayed_AndBasicItemTemplateSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemTemplateBasic");
-			App.Tap("ItemTemplateBasic");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemTemplateBasic", "EmptyViewString");
 			App.WaitForElement("No Items Available(String)");
 		}
 
@@ -604,14 +361,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateEmptyViewStringDisplayedSetFirst_AndBasicItemTemplate()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("ItemTemplateBasic");
-			App.Tap("ItemTemplateBasic");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "ItemTemplateBasic");
 			App.WaitForElement("No Items Available(String)");
 		}
 
@@ -619,14 +369,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateCustomEmptyViewDisplayed_WhenBasicItemTemplateSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemTemplateBasic");
-			App.Tap("ItemTemplateBasic");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemTemplateBasic", "EmptyViewGrid");
 			App.WaitForElement("No Items Available(Grid View)");
 		}
 
@@ -634,14 +377,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 		public void ValidateCustomEmptyViewDisplayedSetFirst_WhenBasicItemTemplate()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("ItemTemplateBasic");
-			App.Tap("ItemTemplateBasic");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "ItemTemplateBasic");
 			App.WaitForElement("No Items Available(Grid View)");
 		}
 
@@ -649,14 +385,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateCustomEmptyViewSizeDisplayed_WhenBasicItemTemplateSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemTemplateBasic");
-			App.Tap("ItemTemplateBasic");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemTemplateBasic", "EmptyViewCustomSize");
 			App.WaitForElement("Custom Empty View (Sized)");
 		}
 
@@ -664,14 +393,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void ValidateCustomEmptyViewSizeDisplayedSetFirst_WhenBasicItemTemplate()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("ItemTemplateBasic");
-			App.Tap("ItemTemplateBasic");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "ItemTemplateBasic");
 			App.WaitForElement("Custom Empty View (Sized)");
 		}
 
@@ -679,12 +401,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void ValidateEmptyViewTemplateDisplayed()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid");
 			App.WaitForElement("No Template Items Available(Grid View)");
 		}
 
@@ -692,12 +409,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 		public void ValidateCustomSizeEmptyViewTemplateDisplayed()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 		}
 
@@ -705,80 +417,43 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 		public void VerifyEmptyViewTemplateDisplaysCorrectly_WithLeftToRightFlowDirection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("FlowDirectionLeftToRight");
-			App.Tap("FlowDirectionLeftToRight");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "FlowDirectionLeftToRight");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			VerifyScreenshot();
 		}
 
-#if TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS // Issue Link - https://github.com/dotnet/maui/issues/34522
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void VerifyEmptyViewTemplateDisplaysCorrectly_WithRightToLeftFlowDirection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("FlowDirectionRightToLeft");
-			App.Tap("FlowDirectionRightToLeft");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "FlowDirectionRightToLeft");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			VerifyScreenshot();
 		}
-#endif
+
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void VerifyCustomSizedEmptyViewTemplateDisplaysCorrectly_WithLeftToRightFlowDirection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("FlowDirectionLeftToRight");
-			App.Tap("FlowDirectionLeftToRight");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "FlowDirectionLeftToRight");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			VerifyScreenshot();
 		}
 
-#if TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS // Issue Link - https://github.com/dotnet/maui/issues/34522
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void VerifyCustomSizedEmptyViewTemplateDisplaysCorrectly_WithRightToLeftFlowDirection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("FlowDirectionRightToLeft");
-			App.Tap("FlowDirectionRightToLeft");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "FlowDirectionRightToLeft");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			VerifyScreenshot();
 		}
-#endif
+
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateEmptyViewTemplateDisplayed_EmptyObservableCollectionSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceEmptyObservableCollection");
-			App.Tap("ItemsSourceEmptyObservableCollection");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceEmptyObservableCollection", "EmptyViewTemplateGrid");
 			App.WaitForElement("No Template Items Available(Grid View)");
 		}
 
@@ -786,14 +461,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateEmptyViewTemplateDisplayedSetFirst_AndEmptyObservableCollection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("ItemsSourceEmptyObservableCollection");
-			App.Tap("ItemsSourceEmptyObservableCollection");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "ItemsSourceEmptyObservableCollection");
 			App.WaitForElement("No Template Items Available(Grid View)");
 		}
 
@@ -801,14 +469,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void ValidateEmptyViewTemplateDisplayed_AndeObservableCollectionSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceObservableCollection");
-			App.Tap("ItemsSourceObservableCollection");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceObservableCollection", "EmptyViewTemplateGrid");
 			App.WaitForNoElement("No Template Items Available(Grid View)");
 		}
 
@@ -816,14 +477,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void ValidateEmptyViewTemplateDisplayedSetFirst_AndObservableCollection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("ItemsSourceObservableCollection");
-			App.Tap("ItemsSourceObservableCollection");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "ItemsSourceObservableCollection");
 			App.WaitForNoElement("No Template Items Available(Grid View)");
 		}
 
@@ -831,14 +485,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateEmptyViewTemplateDisplayed_AndEmptyGroupedListSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceEmptyGroupedList");
-			App.Tap("ItemsSourceEmptyGroupedList");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceEmptyGroupedList", "EmptyViewTemplateGrid");
 			App.WaitForElement("No Template Items Available(Grid View)");
 		}
 
@@ -846,14 +493,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewTemplateDisplayedSetFirst_AndEmptyGroupedList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("ItemsSourceEmptyGroupedList");
-			App.Tap("ItemsSourceEmptyGroupedList");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "ItemsSourceEmptyGroupedList");
 			App.WaitForElement("No Template Items Available(Grid View)");
 		}
 
@@ -861,16 +501,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewTemplateDisplayed_AndGroupedListSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceGroupedList");
-			App.Tap("ItemsSourceGroupedList");
-			App.WaitForElement("IsGroupedTrue");
-			App.Tap("IsGroupedTrue");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceGroupedList", "IsGroupedTrue", "EmptyViewTemplateGrid");
 			App.WaitForNoElement("No Template Items Available(Grid View)");
 		}
 
@@ -878,16 +509,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void ValidateEmptyViewTemplateDisplayedSetFirst_AndGroupedList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("ItemsSourceGroupedList");
-			App.Tap("ItemsSourceGroupedList");
-			App.WaitForElement("IsGroupedTrue");
-			App.Tap("IsGroupedTrue");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "ItemsSourceGroupedList", "IsGroupedTrue");
 			App.WaitForNoElement("No Template Items Available(Grid View)");
 		}
 
@@ -895,14 +517,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyViewTemplateDisplayed_EmptyObservableCollectionSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceEmptyObservableCollection");
-			App.Tap("ItemsSourceEmptyObservableCollection");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceEmptyObservableCollection", "EmptyViewTemplateCustomSize");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 		}
 
@@ -910,14 +525,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateCustomSizeEmptyViewTemplateDisplayedSetFirst_AndEmptyObservableCollection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("ItemsSourceEmptyObservableCollection");
-			App.Tap("ItemsSourceEmptyObservableCollection");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "ItemsSourceEmptyObservableCollection");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 		}
 
@@ -925,14 +533,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void ValidateCustomSizeEmptyViewTemplateDisplayed_AndeObservableCollectionSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceObservableCollection");
-			App.Tap("ItemsSourceObservableCollection");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceObservableCollection", "EmptyViewTemplateCustomSize");
 			App.WaitForNoElement("Custom EmptyViewTemplate (Sized)");
 		}
 
@@ -940,14 +541,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateCustomSizeEmptyViewTemplateDisplayedSetFirst_AndObservableCollection()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("ItemsSourceObservableCollection");
-			App.Tap("ItemsSourceObservableCollection");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "ItemsSourceObservableCollection");
 			App.WaitForNoElement("Custom EmptyViewTemplate (Sized)");
 		}
 
@@ -955,14 +549,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateCustomSizeEmptyViewTemplateDisplayed_AndEmptyGroupedListSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceEmptyGroupedList");
-			App.Tap("ItemsSourceEmptyGroupedList");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceEmptyGroupedList", "EmptyViewTemplateCustomSize");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 		}
 
@@ -970,14 +557,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateCustomSizeEmptyViewTemplateDisplayedSetFirst_AndEmptyGroupedList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("ItemsSourceEmptyGroupedList");
-			App.Tap("ItemsSourceEmptyGroupedList");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "ItemsSourceEmptyGroupedList");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 		}
 
@@ -985,16 +565,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyViewTemplateDisplayed_AndGroupedListSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemsSourceGroupedList");
-			App.Tap("ItemsSourceGroupedList");
-			App.WaitForElement("IsGroupedTrue");
-			App.Tap("IsGroupedTrue");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemsSourceGroupedList", "IsGroupedTrue", "EmptyViewTemplateCustomSize");
 			App.WaitForNoElement("Custom EmptyViewTemplate (Sized)");
 		}
 
@@ -1002,16 +573,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateCustomSizeEmptyViewTemplateDisplayedSetFirst_AndGroupedList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("ItemsSourceGroupedList");
-			App.Tap("ItemsSourceGroupedList");
-			App.WaitForElement("IsGroupedTrue");
-			App.Tap("IsGroupedTrue");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "ItemsSourceGroupedList", "IsGroupedTrue");
 			App.WaitForNoElement("Custom EmptyViewTemplate (Sized)");
 		}
 
@@ -1019,14 +581,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 		public void ValidateEmptyViewTemplateDisplayed_AndEmptyViewString()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "EmptyViewString");
 			App.WaitForElement("No Template Items Available(Grid View)");
 		}
 
@@ -1034,14 +589,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateEmptyViewTemplateDisplayed_AndCustomEmptyView()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "EmptyViewGrid");
 			App.WaitForElement("No Template Items Available(Grid View)");
 		}
 
@@ -1049,14 +597,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void ValidateCustomSizeEmptyViewTemplateDisplayed_AndEmptyViewString()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "EmptyViewString");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 		}
 
@@ -1064,14 +605,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 		public void ValidateCustomSizeEmptyViewTemplateDisplayed_AndCustomEmptyView()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "EmptyViewGrid");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 		}
 
@@ -1079,14 +613,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateCustomSizeEmptyViewTemplateDisplayed_AndCustomSizeEmptyView()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "EmptyViewCustomSize");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 		}
 
@@ -1094,14 +621,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void ValidateEmptyViewTemplateDisplayedSetFirst_AndBasicItemTemplate()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("ItemTemplateBasic");
-			App.Tap("ItemTemplateBasic");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "ItemTemplateBasic");
 			App.WaitForElement("No Template Items Available(Grid View)");
 		}
 
@@ -1109,14 +629,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewTemplateDisplayed_AndBasicTemplateSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemTemplateBasic");
-			App.Tap("ItemTemplateBasic");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemTemplateBasic", "EmptyViewTemplateGrid");
 			App.WaitForElement("No Template Items Available(Grid View)");
 		}
 
@@ -1124,14 +637,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateCustomSizeEmptyViewTemplateDisplayedSetFirst_AndBasicItemTemplate()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("ItemTemplateBasic");
-			App.Tap("ItemTemplateBasic");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "ItemTemplateBasic");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 		}
 
@@ -1139,14 +645,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateCustomSizeEmptyViewTemplateDisplayed_AndBasicTemplateSetFirst()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("ItemTemplateBasic");
-			App.Tap("ItemTemplateBasic");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("ItemTemplateBasic", "EmptyViewTemplateCustomSize");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 		}
 
@@ -1154,72 +653,23 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateEmptyViewSize()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
-			var emptyViewBounds = App.WaitForElement("EmptyViewLabel").GetRect();
-			Assert.That(emptyViewBounds, Is.Not.Null);
-#if ANDROID
-			int expectedWidth = 788;
-			int expectedHeight = 525;
-#elif MACCATALYST
-			int expectedWidth = 235;
-			int expectedHeight = 150;
-#else
-			int expectedWidth = 300;
-			int expectedHeight = 200;
-#endif
-			Assert.That(emptyViewBounds.Width, Is.EqualTo(expectedWidth).Within(5));
-			Assert.That(emptyViewBounds.Height, Is.EqualTo(expectedHeight).Within(5));
+			ApplyOptions("EmptyViewCustomSize");
+			AssertEmptyViewSize("EmptyViewLabel");
 		}
 
-#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST
-		//When setting HeightRequest and WidthRequest in the EmptyViewTemplate, as the values were not applied, preventing proper resizing. Issue Link: https://github.com/dotnet/maui/issues/28605
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 		public void ValidateEmptyViewTemplateSize()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
-			var emptyViewBounds = App.WaitForElement("EmptyViewTemplateLabel").GetRect();
-#if ANDROID
-			int expectedWidth = 788;
-			int expectedHeight = 525;
-#elif MACCATALYST
-			int expectedWidth = 235;
-			int expectedHeight = 150; 
-#else
-			int expectedWidth = 300;
-			int expectedHeight = 200;
-#endif
-			Assert.That(emptyViewBounds.Width, Is.EqualTo(expectedWidth).Within(5));
-			Assert.That(emptyViewBounds.Height, Is.EqualTo(expectedHeight).Within(5));
+			ApplyOptions("EmptyViewTemplateCustomSize");
+			AssertEmptyViewSize("EmptyViewTemplateLabel");
 		}
-#endif
 
-#if TEST_FAILS_ON_ANDROID
-		// CollectionView Footer Becomes Scrollable When EmptyView is Active on Android. Issue Link: https://github.com/dotnet/maui/issues/28350
-		// HeaderTemplate and FooterTemplate are not displayed when ItemsSource is initially set to null on Android. Issue Link: https://github.com/dotnet/maui/issues/28337
-		// Header and footer are not displayed when emptyview selected first Issue Link: https://github.com/dotnet/maui/issues/28351		
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateEmptyViewStringDisplayed_AndHeaderString()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "HeaderString");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(String)");
 		}
@@ -1228,14 +678,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 		public void ValidateEmptyViewStringDisplayed_AndCustomViewHeader()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "HeaderGrid");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(Grid View)");
 		}
@@ -1244,14 +687,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void ValidateCustomEmptyViewSizeDisplayed_AndHeaderString()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "HeaderString");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
 		}
@@ -1260,32 +696,16 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateCustomEmptyViewSizeDisplayed_AndCustomViewHeader()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "HeaderGrid");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
 		}
 
-#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST
-//Footer Not Displayed at the Bottom When EmptyView is Active in CV2 Issue Link: https://github.com/dotnet/maui/issues/28604
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void ValidateEmptyViewStringDisplayed_AndFooterString()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "FooterString");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Footer(String)");
 		}
@@ -1294,14 +714,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void ValidateEmptyViewStringDisplayed_AndCustomViewFooter()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "FooterGrid");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Footer(Grid View)");
 		}
@@ -1310,14 +723,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 		public void ValidateCustomEmptyViewDisplayed_AndFooterString()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "FooterString");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Footer(String)");
 		}
@@ -1326,14 +732,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void ValidateCustomEmptyViewDisplayed_AndCustomViewFooter()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "FooterGrid");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Footer(Grid View)");
 		}
@@ -1342,14 +741,7 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomEmptyViewSizeDisplayed_AndFooterString()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "FooterString");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Footer(String)");
 		}
@@ -1358,31 +750,16 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateCustomEmptyViewSizeDisplayed_AndCustomViewFooter()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "FooterGrid");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Footer(Grid View)");
 		}
 
-//In EmptyView, without explicitly setting HeightRequest and WidthRequest values, the Header and Footer do not appear Issue Link: https://github.com/dotnet/maui/issues/28605
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 		public void ValidateCustomEmptyViewDisplayed_AndHeaderString()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "HeaderString");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
 		}
@@ -1391,864 +768,441 @@ namespace Microsoft.Maui.TestCases.Tests
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 		public void ValidateCustomEmptyViewDisplayed_AndCustomViewHeader()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "HeaderGrid");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
 		}
-#endif
-#endif
 
-#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_ANDROID && TEST_FAILS_ON_WINDOWS && TEST_FAILS_ON_CATALYST
-//CollectionView Header and Footer Do Not Align with Horizontal ItemsLayout When EmptyView is Displayed on https://github.com/dotnet/maui/issues/28622
+#if TEST_FAILS_ON_WINDOWS
 //ItemsLayout does not change its default value on windows Issue Link: https://github.com/dotnet/maui/issues/27946
-//Footer Not Displayed at the Bottom When EmptyView is Active in CV2 Issue Link: https://github.com/dotnet/maui/issues/28604
-//TargetInvocationException Occurs When Selecting Header/Footer After Changing ItemsLayout in CV2 Issue Link : https://github.com/dotnet/maui/issues/28678
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewString_WithHeaderFooterString_WhenVerticalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("ItemsLayoutVerticalList");
-			App.Tap("ItemsLayoutVerticalList");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "ItemsLayoutVerticalList", "HeaderString", "FooterString");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
         
+#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewString_WithHeaderFooterString_WhenHorizontalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("ItemsLayoutHorizontalList");
-			App.Tap("ItemsLayoutHorizontalList");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "ItemsLayoutHorizontalList", "HeaderString", "FooterString");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewString_WithHeaderFooterString_WhenVerticalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("ItemsLayoutVerticalGrid");
-			App.Tap("ItemsLayoutVerticalGrid");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "ItemsLayoutVerticalGrid", "HeaderString", "FooterString");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewString_WithHeaderFooterString_WhenHorizontalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("ItemsLayoutHorizontalGrid");
-			App.Tap("ItemsLayoutHorizontalGrid");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "ItemsLayoutHorizontalGrid", "HeaderString", "FooterString");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
+
+#endif
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomEmptyView_WithHeaderFooterString_WhenVerticalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("ItemsLayoutVerticalList");
-			App.Tap("ItemsLayoutVerticalList");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "ItemsLayoutVerticalList", "HeaderString", "FooterString");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
 
+#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomEmptyView_WithHeaderFooterString_WhenHorizontalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("ItemsLayoutHorizontalList");
-			App.Tap("ItemsLayoutHorizontalList");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "ItemsLayoutHorizontalList", "HeaderString", "FooterString");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomEmptyView_WithHeaderFooterString_WhenVerticalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("ItemsLayoutVerticalGrid");
-			App.Tap("ItemsLayoutVerticalGrid");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "ItemsLayoutVerticalGrid", "HeaderString", "FooterString");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomEmptyView_WithHeaderFooterString_WhenHorizontalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("ItemsLayoutHorizontalGrid");
-			App.Tap("ItemsLayoutHorizontalGrid");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "ItemsLayoutHorizontalGrid", "HeaderString", "FooterString");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
+
+#endif
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyView_WithHeaderFooterString_WhenVerticalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("ItemsLayoutVerticalList");
-			App.Tap("ItemsLayoutVerticalList");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "ItemsLayoutVerticalList", "HeaderString", "FooterString");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
 
+#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyView_WithHeaderFooterString_WhenHorizontalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("ItemsLayoutHorizontalList");
-			App.Tap("ItemsLayoutHorizontalList");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "ItemsLayoutHorizontalList", "HeaderString", "FooterString");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyView_WithHeaderFooterString_WhenVerticalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("ItemsLayoutVerticalGrid");
-			App.Tap("ItemsLayoutVerticalGrid");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "ItemsLayoutVerticalGrid", "HeaderString", "FooterString");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyView_WithHeaderFooterString_WhenHorizontalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("ItemsLayoutHorizontalGrid");
-			App.Tap("ItemsLayoutHorizontalGrid");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "ItemsLayoutHorizontalGrid", "HeaderString", "FooterString");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
+
+#endif
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewTemplate_WithHeaderFooterString_WhenVerticalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("ItemsLayoutVerticalList");
-			App.Tap("ItemsLayoutVerticalList");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "ItemsLayoutVerticalList", "HeaderString", "FooterString");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
         
+#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewTemplate_WithHeaderFooterString_WhenHorizontalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("ItemsLayoutHorizontalList");
-			App.Tap("ItemsLayoutHorizontalList");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "ItemsLayoutHorizontalList", "HeaderString", "FooterString");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewTemplate_WithHeaderFooterString_WhenVerticalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("ItemsLayoutVerticalGrid");
-			App.Tap("ItemsLayoutVerticalGrid");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "ItemsLayoutVerticalGrid", "HeaderString", "FooterString");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewTemplate_WithHeaderFooterString_WhenHorizontalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("ItemsLayoutHorizontalGrid");
-			App.Tap("ItemsLayoutHorizontalGrid");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "ItemsLayoutHorizontalGrid", "HeaderString", "FooterString");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
+
+#endif
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyViewTemplate_WithHeaderFooterString_WhenVerticalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("ItemsLayoutVerticalList");
-			App.Tap("ItemsLayoutVerticalList");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "ItemsLayoutVerticalList", "HeaderString", "FooterString");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
         
+#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyViewTemplate_WithHeaderFooterString_WhenHorizontalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("ItemsLayoutHorizontalList");
-			App.Tap("ItemsLayoutHorizontalList");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "ItemsLayoutHorizontalList", "HeaderString", "FooterString");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyViewTemplate_WithHeaderFooterString_WhenVerticalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("ItemsLayoutVerticalGrid");
-			App.Tap("ItemsLayoutVerticalGrid");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "ItemsLayoutVerticalGrid", "HeaderString", "FooterString");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: false);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyViewTemplate_WithHeaderFooterString_WhenHorizontalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("ItemsLayoutHorizontalGrid");
-			App.Tap("ItemsLayoutHorizontalGrid");
-			App.WaitForElement("HeaderString");
-			App.Tap("HeaderString");
-			App.WaitForElement("FooterString");
-			App.Tap("FooterString");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "ItemsLayoutHorizontalGrid", "HeaderString", "FooterString");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(String)");
-			App.WaitForElement("CollectionView Footer(String)");
+			ScrollToAndWaitForFooter("CollectionView Footer(String)", isHorizontal: true);
 		}
+
+#endif
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewString_WithHeaderFooterView_WhenVerticalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("ItemsLayoutVerticalList");
-			App.Tap("ItemsLayoutVerticalList");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "ItemsLayoutVerticalList", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
         
+#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewString_WithHeaderFooterView_WhenHorizontalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("ItemsLayoutHorizontalList");
-			App.Tap("ItemsLayoutHorizontalList");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "ItemsLayoutHorizontalList", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewString_WithHeaderFooterView_WhenVerticalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("ItemsLayoutVerticalGrid");
-			App.Tap("ItemsLayoutVerticalGrid");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "ItemsLayoutVerticalGrid", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewString_WithHeaderFooterView_WhenHorizontalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewString");
-			App.Tap("EmptyViewString");
-			App.WaitForElement("ItemsLayoutHorizontalGrid");
-			App.Tap("ItemsLayoutHorizontalGrid");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewString", "ItemsLayoutHorizontalGrid", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("No Items Available(String)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
+
+#endif
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomEmptyView_WithHeaderFooterView_WhenVerticalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("ItemsLayoutVerticalList");
-			App.Tap("ItemsLayoutVerticalList");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "ItemsLayoutVerticalList", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
 
+#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomEmptyView_WithHeaderFooterView_WhenHorizontalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("ItemsLayoutHorizontalList");
-			App.Tap("ItemsLayoutHorizontalList");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "ItemsLayoutHorizontalList", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomEmptyView_WithHeaderFooterView_WhenVerticalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("ItemsLayoutVerticalGrid");
-			App.Tap("ItemsLayoutVerticalGrid");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "ItemsLayoutVerticalGrid", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomEmptyView_WithHeaderFooterView_WhenHorizontalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewGrid");
-			App.Tap("EmptyViewGrid");
-			App.WaitForElement("ItemsLayoutHorizontalGrid");
-			App.Tap("ItemsLayoutHorizontalGrid");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewGrid", "ItemsLayoutHorizontalGrid", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("No Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
+
+#endif
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyView_WithHeaderFooterView_WhenVerticalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("ItemsLayoutVerticalList");
-			App.Tap("ItemsLayoutVerticalList");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "ItemsLayoutVerticalList", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
 
+#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyView_WithHeaderFooterView_WhenHorizontalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("ItemsLayoutHorizontalList");
-			App.Tap("ItemsLayoutHorizontalList");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "ItemsLayoutHorizontalList", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyView_WithHeaderFooterView_WhenVerticalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("ItemsLayoutVerticalGrid");
-			App.Tap("ItemsLayoutVerticalGrid");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "ItemsLayoutVerticalGrid", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyView_WithHeaderFooterView_WhenHorizontalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewCustomSize");
-			App.Tap("EmptyViewCustomSize");
-			App.WaitForElement("ItemsLayoutHorizontalGrid");
-			App.Tap("ItemsLayoutHorizontalGrid");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewCustomSize", "ItemsLayoutHorizontalGrid", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("Custom Empty View (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
+
+#endif
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewTemplate_WithHeaderFooterView_WhenVerticalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("ItemsLayoutVerticalList");
-			App.Tap("ItemsLayoutVerticalList");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "ItemsLayoutVerticalList", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
         
+#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewTemplate_WithHeaderFooterView_WhenHorizontalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("ItemsLayoutHorizontalList");
-			App.Tap("ItemsLayoutHorizontalList");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "ItemsLayoutHorizontalList", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewTemplate_WithHeaderFooterView_WhenVerticalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("ItemsLayoutVerticalGrid");
-			App.Tap("ItemsLayoutVerticalGrid");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "ItemsLayoutVerticalGrid", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateEmptyViewTemplate_WithHeaderFooterView_WhenHorizontalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateGrid");
-			App.Tap("EmptyViewTemplateGrid");
-			App.WaitForElement("ItemsLayoutHorizontalGrid");
-			App.Tap("ItemsLayoutHorizontalGrid");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateGrid", "ItemsLayoutHorizontalGrid", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("No Template Items Available(Grid View)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
+
+#endif
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyViewTemplate_WithHeaderFooterView_WhenVerticalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("ItemsLayoutVerticalList");
-			App.Tap("ItemsLayoutVerticalList");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "ItemsLayoutVerticalList", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
         
+#if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyViewTemplate_WithHeaderFooterView_WhenHorizontalList()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("ItemsLayoutHorizontalList");
-			App.Tap("ItemsLayoutHorizontalList");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "ItemsLayoutHorizontalList", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyViewTemplate_WithHeaderFooterView_WhenVerticalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("ItemsLayoutVerticalGrid");
-			App.Tap("ItemsLayoutVerticalGrid");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "ItemsLayoutVerticalGrid", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: false);
 		}
 
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void ValidateCustomSizeEmptyViewTemplate_WithHeaderFooterView_WhenHorizontalGrid()
 		{
-			App.WaitForElement("Options");
-			App.Tap("Options");
-			App.WaitForElement("EmptyViewTemplateCustomSize");
-			App.Tap("EmptyViewTemplateCustomSize");
-			App.WaitForElement("ItemsLayoutHorizontalGrid");
-			App.Tap("ItemsLayoutHorizontalGrid");
-			App.WaitForElement("HeaderGrid");
-			App.Tap("HeaderGrid");
-			App.WaitForElement("FooterGrid");
-			App.Tap("FooterGrid");
-			App.WaitForElement("Apply");
-			App.Tap("Apply");
+			ApplyOptions("EmptyViewTemplateCustomSize", "ItemsLayoutHorizontalGrid", "HeaderGrid", "FooterGrid");
 			App.WaitForElement("Custom EmptyViewTemplate (Sized)");
 			App.WaitForElement("CollectionView Header(Grid View)");
-			App.WaitForElement("CollectionView Footer(Grid View)");
+			ScrollToAndWaitForFooter("CollectionView Footer(Grid View)", isHorizontal: true);
 		}
+#endif
 #endif
 	}
 }
