@@ -121,6 +121,16 @@ namespace Microsoft.Maui.TestCases.Tests
 			App.WaitForNoElement("No Items Available(String)");
 		}
 
+		[TestCase("EmptyViewString", "No Items Available(String)")]
+		[TestCase("EmptyViewGrid", "No Items Available(Grid View)")]
+		[TestCase("EmptyViewTemplateGrid", "No Template Items Available(Grid View)")]
+		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
+		public void ValidateEmptyViewReappears_WhenObservableCollectionIsReplacedWithNull(string emptyViewOption, string emptyViewText)
+		{
+			ApplyOptions(emptyViewOption, "ItemsSourceObservableCollection", "ItemsSourceNone");
+			App.WaitForElement(emptyViewText);
+		}
+
 		[Test]
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void ValidateEmptyViewStringDisplayed_AndEmptyGroupedListSetFirst()
