@@ -150,6 +150,31 @@ public class CollectionViewViewModel : INotifyPropertyChanged
 		SelectedItems.CollectionChanged += OnSelectedItemsChanged;
 	}
 
+	public void ResetEmptyViewProperties()
+	{
+		_emptyView = null;
+		_emptyViewTemplate = null;
+		_header = null;
+		_footer = null;
+		_itemsLayout = new LinearItemsLayout(ItemsLayoutOrientation.Vertical);
+		_itemsSourceType = ItemsSourceType.None;
+		_isGrouped = false;
+		_flowDirection = FlowDirection.MatchParent;
+
+		SetItemTemplate();
+
+		OnPropertyChanged(nameof(ItemsSource));
+		OnPropertyChanged(nameof(IsGrouped));
+		OnPropertyChanged(nameof(EmptyView));
+		OnPropertyChanged(nameof(EmptyViewTemplate));
+		OnPropertyChanged(nameof(Header));
+		OnPropertyChanged(nameof(Footer));
+		OnPropertyChanged(nameof(ItemsLayout));
+		OnPropertyChanged(nameof(ItemsSourceType));
+		OnPropertyChanged(nameof(FlowDirection));
+		OnPropertyChanged(nameof(ShowAddRemoveButtons));
+	}
+
 	public object EmptyView
 	{
 		get => _emptyView;

@@ -2,7 +2,7 @@ namespace Maui.Controls.Sample;
 
 public partial class CollectionViewEmptyViewPage : ContentPage
 {
-	private CollectionViewViewModel _viewModel;
+	private readonly CollectionViewViewModel _viewModel;
 
 	public CollectionViewEmptyViewPage()
 	{
@@ -13,7 +13,7 @@ public partial class CollectionViewEmptyViewPage : ContentPage
 
 	private async void NavigateToOptionsPage_Clicked(object sender, EventArgs e)
 	{
-		BindingContext = _viewModel = new CollectionViewViewModel();
+		_viewModel.ResetEmptyViewProperties();
 		await Navigation.PushAsync(new EmptyViewOptionsPage(_viewModel));
 	}
 }
