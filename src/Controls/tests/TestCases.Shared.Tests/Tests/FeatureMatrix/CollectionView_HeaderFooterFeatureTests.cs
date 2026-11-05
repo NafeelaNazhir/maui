@@ -36,20 +36,73 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	{
 	}
 
+	private void ApplyOptions(params string[] optionIds)
+	{
+		App.WaitForElementTillPageNavigationSettled(Options);
+		App.Tap(Options);
+
+		foreach (var optionId in optionIds)
+		{
+			App.WaitForElementTillPageNavigationSettled(optionId);
+			App.Tap(optionId);
+		}
+
+		App.WaitForElementTillPageNavigationSettled(Apply);
+		App.Tap(Apply);
+	}
+
+	private double GetFirstItemTopInset()
+	{
+		var collectionView = App.WaitForElementTillPageNavigationSettled("CollectionViewControl").GetRect();
+		var apple = App.WaitForElementTillPageNavigationSettled("Apple").GetRect();
+		return apple.Y - collectionView.Y;
+	}
+
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
+	public void VerifyFeatureOptionsResetWhenReopeningOptions()
+	{
+		ApplyOptions(ItemsSourceNone);
+		App.WaitForNoElement("Apple");
+
+		ApplyOptions();
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForElementTillPageNavigationSettled("Mango");
+	}
+
+	[TestCase(ItemTemplateBasic, ItemsSourceObservableCollection25)]
+	[TestCase(ItemsSourceObservableCollection25, ItemTemplateBasic)]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
+	public void VerifyBasicItemTemplatePreservedWhenChangingItemsSource(string firstOption, string secondOption)
+	{
+		ApplyOptions();
+		var defaultInset = GetFirstItemTopInset();
+
+		ApplyOptions(firstOption, secondOption);
+		Assert.That(GetFirstItemTopInset(), Is.LessThan(defaultInset));
+	}
 
 #if TEST_FAILS_ON_IOS && TEST_FAILS_ON_CATALYST //In CV2, unintended synchronization between the HeaderTemplate/FooterTemplate and Header/Footer views, related issue: https://github.com/dotnet/maui/issues/28504
+	[TestCase(HeaderString, FooterString, "CollectionView Header(String)", "CollectionView Footer(String)")]
+	[TestCase(HeaderGrid, FooterGrid, "HeaderViewLabel", "FooterViewLabel")]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
+	public void VerifyHeaderFooterResetWhenReopeningOptions(string headerOption, string footerOption, string headerId, string footerId)
+	{
+		ApplyOptions(headerOption, footerOption);
+		App.WaitForElementTillPageNavigationSettled(headerId);
+		App.WaitForElementTillPageNavigationSettled(footerId);
+
+		ApplyOptions();
+		App.WaitForElementTillPageNavigationSettled("Apple");
+		App.WaitForNoElement(headerId);
+		App.WaitForNoElement(footerId);
+	}
+
 	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyHeaderStringWithItemsSourceObservableCollection25()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceObservableCollection25);
-		App.Tap(ItemsSourceObservableCollection25);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderString, ItemsSourceObservableCollection25);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.ScrollDown("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
@@ -61,12 +114,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyHeaderStringWithItemsSourceObservableCollection5()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderString);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -76,14 +124,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyHeaderStringWithItemsSourceNone()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceNone);
-		App.Tap(ItemsSourceNone);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderString, ItemsSourceNone);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 	}
 
@@ -91,14 +132,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyHeaderViewWithItemsSourceObservableCollection25()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceObservableCollection25);
-		App.Tap(ItemsSourceObservableCollection25);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderGrid, ItemsSourceObservableCollection25);
 		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.ScrollDown("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
@@ -110,14 +144,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyHeaderViewWithItemsSourceObservableCollection5()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceObservableCollection5);
-		App.Tap(ItemsSourceObservableCollection5);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderGrid, ItemsSourceObservableCollection5);
 		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -127,14 +154,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 	public void VerifyHeaderViewWithItemsSourceNone()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceNone);
-		App.Tap(ItemsSourceNone);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderGrid, ItemsSourceNone);
 		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 	}
 
@@ -143,16 +163,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyHeaderStringWithEmptyViewString()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceNone);
-		App.Tap(ItemsSourceNone);
-		App.WaitForElementTillPageNavigationSettled(EmptyViewString);
-		App.Tap(EmptyViewString);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderString, ItemsSourceNone, EmptyViewString);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 		App.WaitForElementTillPageNavigationSettled("No Items Available(String)");
 	}
@@ -161,16 +172,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 	public void VerifyHeaderViewWithEmptyViewString()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceNone);
-		App.Tap(ItemsSourceNone);
-		App.WaitForElementTillPageNavigationSettled(EmptyViewString);
-		App.Tap(EmptyViewString);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderGrid, ItemsSourceNone, EmptyViewString);
 		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 		App.WaitForElementTillPageNavigationSettled("No Items Available(String)");
 	}
@@ -180,14 +182,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyHeaderStringWithFooterString()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(FooterString);
-		App.Tap(FooterString);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderString, FooterString);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -198,14 +193,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 	public void VerifyHeaderViewWithFooterView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(FooterGrid);
-		App.Tap(FooterGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderGrid, FooterGrid);
 		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -216,14 +204,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyHeaderStringWithFooterView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(FooterGrid);
-		App.Tap(FooterGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderString, FooterGrid);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -234,14 +215,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 	public void VerifyHeaderViewWithFooterString()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(FooterString);
-		App.Tap(FooterString);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderGrid, FooterString);
 		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -253,14 +227,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 		public void VerifyHeaderStringWhenFooterTemplateView()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderString);
-			App.Tap(HeaderString);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderString, FooterTemplateGrid);
 			App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
@@ -271,14 +238,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 		public void VerifyHeaderViewWhenFooterTemplateView()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-			App.Tap(HeaderGrid);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderGrid, FooterTemplateGrid);
 			App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
@@ -291,18 +251,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyHeaderStringWhenGroupHeaderTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-		App.Tap(IsGroupedTrue);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceGroupedList);
-		App.Tap(ItemsSourceGroupedList);
-		App.WaitForElementTillPageNavigationSettled(GroupHeaderTemplateGrid);
-		App.Tap(GroupHeaderTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderString, IsGroupedTrue, ItemsSourceGroupedList, GroupHeaderTemplateGrid);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("GroupHeaderTemplateLabel");
@@ -313,18 +262,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 	public void VerifyHeaderViewWhenGroupHeaderTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-		App.Tap(IsGroupedTrue);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceGroupedList);
-		App.Tap(ItemsSourceGroupedList);
-		App.WaitForElementTillPageNavigationSettled(GroupHeaderTemplateGrid);
-		App.Tap(GroupHeaderTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderGrid, IsGroupedTrue, ItemsSourceGroupedList, GroupHeaderTemplateGrid);
 		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 		App.WaitForElementTillPageNavigationSettled("GroupHeaderTemplateLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
@@ -335,18 +273,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 	public void VerifyHeaderStringWhenGroupFooterTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-		App.Tap(IsGroupedTrue);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceGroupedList);
-		App.Tap(ItemsSourceGroupedList);
-		App.WaitForElementTillPageNavigationSettled(GroupFooterTemplateGrid);
-		App.Tap(GroupFooterTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderString, IsGroupedTrue, ItemsSourceGroupedList, GroupFooterTemplateGrid);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 		App.WaitForElementTillPageNavigationSettled("GroupFooterTemplateLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
@@ -357,18 +284,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 	public void VerifyHeaderViewWhenGroupFooterTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-		App.Tap(IsGroupedTrue);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceGroupedList);
-		App.Tap(ItemsSourceGroupedList);
-		App.WaitForElementTillPageNavigationSettled(GroupFooterTemplateGrid);
-		App.Tap(GroupFooterTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderGrid, IsGroupedTrue, ItemsSourceGroupedList, GroupFooterTemplateGrid);
 		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 		App.WaitForElementTillPageNavigationSettled("GroupFooterTemplateLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
@@ -381,14 +297,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void VerifyHeaderStringWhenHeaderTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-		App.Tap(HeaderTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderString, HeaderTemplateGrid);
 		App.WaitForNoElement("CollectionView Header(String)");
 		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
@@ -399,14 +308,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 	public void VerifyHeaderViewWhenHeaderTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-		App.Tap(HeaderTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderGrid, HeaderTemplateGrid);
 		App.WaitForNoElement("HeaderViewLabel");
 		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
@@ -419,24 +321,10 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyHeaderStringWhenIsGroupedTrueOrFalse()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderString);
-			App.Tap(HeaderString);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-			App.Tap(IsGroupedTrue);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderString, IsGroupedTrue);
 			App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderString);
-			App.Tap(HeaderString);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
-			App.Tap(IsGroupedFalse);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderString, IsGroupedFalse);
 			App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 		}
@@ -445,24 +333,10 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyHeaderViewWhenIsGroupedTrueOrFalse()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-			App.Tap(HeaderGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-			App.Tap(IsGroupedTrue);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderGrid, IsGroupedTrue);
 			App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-			App.Tap(HeaderGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
-			App.Tap(IsGroupedFalse);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderGrid, IsGroupedFalse);
 			App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 		}
@@ -472,14 +346,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 	public void VerifyHeaderStringWhenBasicDataTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(ItemTemplateBasic);
-		App.Tap(ItemTemplateBasic);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderString, ItemTemplateBasic);
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
 		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
@@ -489,14 +356,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyHeaderViewWhenBasicDataTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemTemplateBasic);
-		App.Tap(ItemTemplateBasic);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderGrid, ItemTemplateBasic);
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
 		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
@@ -507,14 +367,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void VerifyHeaderStringWithItemsLayoutVerticalGrid()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(ItemsLayoutVerticalGrid);
-		App.Tap(ItemsLayoutVerticalGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderString, ItemsLayoutVerticalGrid);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -524,14 +377,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void VerifyHeaderViewWithItemsLayoutVerticalGrid()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemsLayoutVerticalGrid);
-		App.Tap(ItemsLayoutVerticalGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderGrid, ItemsLayoutVerticalGrid);
 		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -541,14 +387,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyHeaderStringWithItemsLayoutHorizontalList()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(ItemsLayoutHorizontalList);
-		App.Tap(ItemsLayoutHorizontalList);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderString, ItemsLayoutHorizontalList);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.ScrollRight("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
@@ -559,14 +398,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyHeaderViewWithItemsLayoutHorizontalList()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemsLayoutHorizontalList);
-		App.Tap(ItemsLayoutHorizontalList);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderGrid, ItemsLayoutHorizontalList);
 		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.ScrollRight("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
@@ -577,14 +409,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyHeaderViewWithItemsLayoutHorizontalGrid()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemsLayoutHorizontalGrid);
-		App.Tap(ItemsLayoutHorizontalList);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderGrid, ItemsLayoutHorizontalGrid);
 		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.ScrollRight("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
@@ -595,14 +420,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyHeaderStringWithItemsLayoutHorizontalGrid()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(ItemsLayoutHorizontalGrid);
-		App.Tap(ItemsLayoutHorizontalList);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderString, ItemsLayoutHorizontalGrid);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.ScrollRight("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
@@ -616,12 +434,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 		public void VerifyHeaderTemplateWithItemsSourceObserableCollection5()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderTemplateGrid);
 			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
@@ -631,14 +444,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 		public void VerifyHeaderTemplateWithItemsSourceObserableCollection25()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(ItemsSourceObservableCollection25);
-			App.Tap(ItemsSourceObservableCollection25);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderTemplateGrid, ItemsSourceObservableCollection25);
 			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.ScrollDown("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
@@ -650,14 +456,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 		public void VerifyHeaderTemplateWithItemsSourceNone()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(ItemsSourceNone);
-			App.Tap(ItemsSourceNone);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderTemplateGrid, ItemsSourceNone);
 			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 		}
 #endif
@@ -667,16 +466,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void VerifyHeaderTemplateWhenEmptyViewString()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(ItemsSourceNone);
-			App.Tap(ItemsSourceNone);
-			App.WaitForElementTillPageNavigationSettled(EmptyViewString);
-			App.Tap(EmptyViewString);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderTemplateGrid, ItemsSourceNone, EmptyViewString);
 			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 			App.WaitForElementTillPageNavigationSettled("No Items Available(String)");
 		}
@@ -687,14 +477,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 		public void VerifyHeaderTempalteWhenFooterTemplateView()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderTemplateGrid, FooterTemplateGrid);
 			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
@@ -707,18 +490,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyHeaderTemplateWhenGroupFooterTemplate()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-		App.Tap(HeaderTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-		App.Tap(IsGroupedTrue);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceGroupedList);
-		App.Tap(ItemsSourceGroupedList);
-		App.WaitForElementTillPageNavigationSettled(GroupFooterTemplateGrid);
-		App.Tap(GroupFooterTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderTemplateGrid, IsGroupedTrue, ItemsSourceGroupedList, GroupFooterTemplateGrid);
 		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 		App.WaitForElementTillPageNavigationSettled("GroupFooterTemplateLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
@@ -729,18 +501,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 	public void VerifyHeaderTemplateWhenGroupHeaderTemplate()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-		App.Tap(HeaderTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-		App.Tap(IsGroupedTrue);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceGroupedList);
-		App.Tap(ItemsSourceGroupedList);
-		App.WaitForElementTillPageNavigationSettled(GroupHeaderTemplateGrid);
-		App.Tap(GroupHeaderTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderTemplateGrid, IsGroupedTrue, ItemsSourceGroupedList, GroupHeaderTemplateGrid);
 		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 		App.WaitForElementTillPageNavigationSettled("GroupHeaderTemplateLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
@@ -753,14 +514,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 	public void VerifyHeaderTemplateWhenHeaderString()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-		App.Tap(HeaderTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderTemplateGrid, HeaderString);
 		App.WaitForNoElement("CollectionView Header(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -771,14 +525,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyHeaderTemplateWhenHeaderView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-		App.Tap(HeaderTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderTemplateGrid, HeaderGrid);
 		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 		App.WaitForNoElement("HeaderViewLabel");
 	}
@@ -789,24 +536,10 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyHeaderTemplateWhenIsGroupedTrueOrFalse()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-			App.Tap(IsGroupedTrue);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderTemplateGrid, IsGroupedTrue);
 			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
-			App.Tap(IsGroupedFalse);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderTemplateGrid, IsGroupedFalse);
 			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 		}
@@ -816,14 +549,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 	public void VerifyHeaderTemplateWhenBasicDataTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-		App.Tap(HeaderTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemTemplateBasic);
-		App.Tap(ItemTemplateBasic);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(HeaderTemplateGrid, ItemTemplateBasic);
 		App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -834,14 +560,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyHeaderTemplateWithItemsLayoutVerticalGrid()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(ItemsLayoutVerticalGrid);
-			App.Tap(ItemsLayoutVerticalGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderTemplateGrid, ItemsLayoutVerticalGrid);
 			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
@@ -851,14 +570,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyHeaderTemplateWithItemsLayoutHorizontalList()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(ItemsLayoutHorizontalList);
-			App.Tap(ItemsLayoutHorizontalList);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderTemplateGrid, ItemsLayoutHorizontalList);
 			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.ScrollRight("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
@@ -869,14 +581,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyHeaderTemplateWithItemsLayoutHorizontalGrid()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(ItemsLayoutHorizontalGrid);
-			App.Tap(ItemsLayoutHorizontalList);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(HeaderTemplateGrid, ItemsLayoutHorizontalGrid);
 			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.ScrollRight("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
@@ -889,12 +594,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 	public void VerifyFooterStringWithItemsSourceObservableCollection5()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterString);
-		App.Tap(FooterString);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterString);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -904,14 +604,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyFooterStringWithItemsSourceNone()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterString);
-		App.Tap(FooterString);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceNone);
-		App.Tap(ItemsSourceNone);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterString, ItemsSourceNone);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
 	}
 
@@ -920,14 +613,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyFooterStringWithItemsSourceObservableCollection25()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterString);
-		App.Tap(FooterString);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceObservableCollection25);
-		App.Tap(ItemsSourceObservableCollection25);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterString, ItemsSourceObservableCollection25);
 		App.WaitForNoElement("CollectionView Footer(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.ScrollDown("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
@@ -939,12 +625,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyFooterViewWithItemsSourceObservableCollection5()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterGrid);
-		App.Tap(FooterGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterGrid);
 		App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -954,14 +635,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyFooterViewWithItemsSourceObservableCollection25()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterGrid);
-		App.Tap(FooterGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceObservableCollection25);
-		App.Tap(ItemsSourceObservableCollection25);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterGrid, ItemsSourceObservableCollection25);
 		App.WaitForNoElement("CollectionView Footer(Grid View)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.ScrollDown("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
@@ -973,14 +647,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyFooterViewWithItemsSourceNone()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterGrid);
-		App.Tap(FooterGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceNone);
-		App.Tap(ItemsSourceNone);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterGrid, ItemsSourceNone);
 		App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
 	}
 
@@ -989,16 +656,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyFooterStringWhenEmptyViewString()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterString);
-			App.Tap(FooterString);
-			App.WaitForElementTillPageNavigationSettled(ItemsSourceNone);
-			App.Tap(ItemsSourceNone);
-			App.WaitForElementTillPageNavigationSettled(EmptyViewString);
-			App.Tap(EmptyViewString);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterString, ItemsSourceNone, EmptyViewString);
 			App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
 			App.WaitForElementTillPageNavigationSettled("No Items Available(String)");
 		}
@@ -1007,16 +665,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyFooterViewWhenEmptyViewString()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterGrid);
-			App.Tap(FooterGrid);
-			App.WaitForElementTillPageNavigationSettled(ItemsSourceNone);
-			App.Tap(ItemsSourceNone);
-			App.WaitForElementTillPageNavigationSettled(EmptyViewString);
-			App.Tap(EmptyViewString);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterGrid, ItemsSourceNone, EmptyViewString);
 			App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
 			App.WaitForElementTillPageNavigationSettled("No Items Available(String)");
 		}
@@ -1027,14 +676,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void VerifyFooterStringWhenFooterTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterString);
-		App.Tap(FooterString);
-		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-		App.Tap(FooterTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterString, FooterTemplateGrid);
 		App.WaitForNoElement("CollectionView Footer(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1045,14 +687,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyFooterViewWhenFooterTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterGrid);
-		App.Tap(FooterGrid);
-		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-		App.Tap(FooterTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterGrid, FooterTemplateGrid);
 		App.WaitForNoElement("FooterViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1065,18 +700,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 	public void VerifyFooterStringWhenGroupFooterTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterString);
-		App.Tap(FooterString);
-		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-		App.Tap(IsGroupedTrue);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceGroupedList);
-		App.Tap(ItemsSourceGroupedList);
-		App.WaitForElementTillPageNavigationSettled(GroupFooterTemplateGrid);
-		App.Tap(GroupFooterTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterString, IsGroupedTrue, ItemsSourceGroupedList, GroupFooterTemplateGrid);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
 		App.WaitForElementTillPageNavigationSettled("Fruits");
 		App.WaitForElementTillPageNavigationSettled("Vegetables");
@@ -1089,18 +713,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyFooterViewWhenGroupFooterTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterGrid);
-		App.Tap(FooterGrid);
-		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-		App.Tap(IsGroupedTrue);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceGroupedList);
-		App.Tap(ItemsSourceGroupedList);
-		App.WaitForElementTillPageNavigationSettled(GroupFooterTemplateGrid);
-		App.Tap(GroupFooterTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterGrid, IsGroupedTrue, ItemsSourceGroupedList, GroupFooterTemplateGrid);
 		App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Fruits");
 		App.WaitForElementTillPageNavigationSettled("Vegetables");
@@ -1113,18 +726,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 	public void VerifyFooterStringWhenGroupHeaderTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterString);
-		App.Tap(FooterString);
-		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-		App.Tap(IsGroupedTrue);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceGroupedList);
-		App.Tap(ItemsSourceGroupedList);
-		App.WaitForElementTillPageNavigationSettled(GroupHeaderTemplateGrid);
-		App.Tap(GroupHeaderTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterString, IsGroupedTrue, ItemsSourceGroupedList, GroupHeaderTemplateGrid);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Potato");
@@ -1135,18 +737,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 	public void VerifyFooterViewWhenGroupHeaderTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterGrid);
-		App.Tap(FooterGrid);
-		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-		App.Tap(IsGroupedTrue);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceGroupedList);
-		App.Tap(ItemsSourceGroupedList);
-		App.WaitForElementTillPageNavigationSettled(GroupHeaderTemplateGrid);
-		App.Tap(GroupHeaderTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterGrid, IsGroupedTrue, ItemsSourceGroupedList, GroupHeaderTemplateGrid);
 		App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Potato");
@@ -1158,14 +749,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyFooterStringWhenHeaderString()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterString);
-		App.Tap(FooterString);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterString, HeaderString);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1176,14 +760,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 	public void VerifyFooterViewWhenHeaderString()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterGrid);
-		App.Tap(FooterGrid);
-		App.WaitForElementTillPageNavigationSettled(HeaderString);
-		App.Tap(HeaderString);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterGrid, HeaderString);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1194,14 +771,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void VerifyFooterStringWhenHeaderView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterString);
-		App.Tap(FooterString);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterString, HeaderGrid);
 		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1212,14 +782,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyFooterViewWhenHeaderView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterGrid);
-		App.Tap(FooterGrid);
-		App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-		App.Tap(HeaderGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterGrid, HeaderGrid);
 		App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1231,14 +794,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void VerifyFooterStringWhenHeaderTemplate()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterString);
-			App.Tap(FooterString);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterString, HeaderTemplateGrid);
 			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1249,14 +805,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void VerifyFooterViewWhenHeaderTemplate()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterGrid);
-			App.Tap(FooterGrid);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterGrid, HeaderTemplateGrid);
 			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1269,25 +818,11 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyFooterStringWhenIsGroupedTrueOrFalse()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterString);
-			App.Tap(FooterString);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-			App.Tap(IsGroupedTrue);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterString, IsGroupedTrue);
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
 			App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterString);
-			App.Tap(FooterString);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
-			App.Tap(IsGroupedFalse);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterString, IsGroupedFalse);
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
 			App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
@@ -1297,25 +832,11 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyFooterViewWhenIsGroupedTrueOrFalse()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterGrid);
-			App.Tap(FooterGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-			App.Tap(IsGroupedTrue);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterGrid, IsGroupedTrue);
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
 			App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterGrid);
-			App.Tap(FooterGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
-			App.Tap(IsGroupedFalse);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterGrid, IsGroupedFalse);
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
 			App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
@@ -1325,14 +846,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyFooterStringWhenBasicDataTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterString);
-		App.Tap(FooterString);
-		App.WaitForElementTillPageNavigationSettled(ItemTemplateBasic);
-		App.Tap(ItemTemplateBasic);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterString, ItemTemplateBasic);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 	}
@@ -1341,14 +855,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void VerifyFooterViewWhenBasicDataTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterGrid);
-		App.Tap(FooterGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemTemplateBasic);
-		App.Tap(ItemTemplateBasic);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterGrid, ItemTemplateBasic);
 		App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 	}
@@ -1358,14 +865,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 	public void VerifyFooterStringWithItemsLayoutVerticalGrid()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterString);
-		App.Tap(FooterString);
-		App.WaitForElementTillPageNavigationSettled(ItemsLayoutVerticalGrid);
-		App.Tap(ItemsLayoutVerticalGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterString, ItemsLayoutVerticalGrid);
 		App.WaitForElementTillPageNavigationSettled("CollectionView Footer(String)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 	}
@@ -1374,14 +874,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void VerifyFooterViewWithItemsLayoutVerticalGrid()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterGrid);
-		App.Tap(FooterGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemsLayoutVerticalGrid);
-		App.Tap(ItemsLayoutVerticalGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterGrid, ItemsLayoutVerticalGrid);
 		App.WaitForElementTillPageNavigationSettled("FooterViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 	}
@@ -1390,14 +883,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyFooterStringWithItemsLayoutHorizontalList()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterString);
-		App.Tap(FooterString);
-		App.WaitForElementTillPageNavigationSettled(ItemsLayoutHorizontalList);
-		App.Tap(ItemsLayoutHorizontalList);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterString, ItemsLayoutHorizontalList);
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.ScrollRight("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1408,14 +894,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 	public void VerifyFooterViewWithItemsLayoutHorizontalList()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterGrid);
-		App.Tap(FooterGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemsLayoutHorizontalList);
-		App.Tap(ItemsLayoutHorizontalList);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterGrid, ItemsLayoutHorizontalList);
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.ScrollRight("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1426,14 +905,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyFooterStringWithItemsLayoutHorizontalGrid()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterString);
-		App.Tap(FooterString);
-		App.WaitForElementTillPageNavigationSettled(ItemsLayoutHorizontalGrid);
-		App.Tap(ItemsLayoutHorizontalList);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterString, ItemsLayoutHorizontalGrid);
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.ScrollRight("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1444,14 +916,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 	public void VerifyFooterViewWithItemsLayoutHorizontalGrid()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterGrid);
-		App.Tap(FooterGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemsLayoutHorizontalGrid);
-		App.Tap(ItemsLayoutHorizontalList);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterGrid, ItemsLayoutHorizontalGrid);
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.ScrollRight("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1465,12 +930,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void VerifyFooterTemplateWithItemsSourceObservableCollections5()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterTemplateGrid);
 			App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 		}
@@ -1479,14 +939,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyFooterTemplateWithItemsSourceObservableCollections25()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-		App.Tap(FooterTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceObservableCollection25);
-		App.Tap(ItemsSourceObservableCollection25);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterTemplateGrid, ItemsSourceObservableCollection25);
 		App.WaitForNoElement("Footer Template(Grid View)");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.ScrollDown("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
@@ -1497,14 +950,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void VerifyFooterTemplateWithItemsSourceNone()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-		App.Tap(FooterTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceNone);
-		App.Tap(ItemsSourceNone);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterTemplateGrid, ItemsSourceNone);
 		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
 	}
 
@@ -1514,32 +960,18 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyFooterTemplateWhenEmptyViewString()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(ItemsSourceNone);
-			App.Tap(ItemsSourceNone);
-			App.WaitForElementTillPageNavigationSettled(EmptyViewString);
-			App.Tap(EmptyViewString);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterTemplateGrid, ItemsSourceNone, EmptyViewString);
 			App.WaitForElementTillPageNavigationSettled("No Items Available(String)");
 			App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
 		}
 #endif
 
 #if TEST_FAILS_ON_WINDOWS && TEST_FAILS_ON_CATALYST && TEST_FAILS_ON_IOS //In Windows, related issue: https://github.com/dotnet/maui/issues/28337 and In CV2, related issue: https://github.com/dotnet/maui/issues/28504
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 	public void VerifyFooterTemplateWhenFooterString()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-		App.Tap(FooterTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(FooterString);
-		App.Tap(FooterString);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterTemplateGrid, FooterString);
 		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1550,14 +982,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 1)]
 	public void VerifyFooterTemplateWhenFooterView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-		App.Tap(FooterTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(FooterGrid);
-		App.Tap(FooterGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterTemplateGrid, FooterGrid);
 		App.WaitForNoElement("FooterViewLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1570,18 +995,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 7)]
 	public void VerifyFooterTemplateWhenGroupFooterTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-		App.Tap(FooterTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-		App.Tap(IsGroupedTrue);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceGroupedList);
-		App.Tap(ItemsSourceGroupedList);
-		App.WaitForElementTillPageNavigationSettled(GroupFooterTemplateGrid);
-		App.Tap(GroupFooterTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterTemplateGrid, IsGroupedTrue, ItemsSourceGroupedList, GroupFooterTemplateGrid);
 		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
 		App.WaitForElementTillPageNavigationSettled("Fruits");
 		App.WaitForElementTillPageNavigationSettled("Vegetables");
@@ -1594,18 +1008,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 5)]
 	public void VerifyFooterTemplateWhenGroupHeaderTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-		App.Tap(FooterTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-		App.Tap(IsGroupedTrue);
-		App.WaitForElementTillPageNavigationSettled(ItemsSourceGroupedList);
-		App.Tap(ItemsSourceGroupedList);
-		App.WaitForElementTillPageNavigationSettled(GroupHeaderTemplateGrid);
-		App.Tap(GroupHeaderTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterTemplateGrid, IsGroupedTrue, ItemsSourceGroupedList, GroupHeaderTemplateGrid);
 		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 		App.WaitForElementTillPageNavigationSettled("Potato");
@@ -1618,14 +1021,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 4)]
 		public void VerifyFooterTemplateWhenHeaderString()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(HeaderString);
-			App.Tap(HeaderString);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterTemplateGrid, HeaderString);
 			App.WaitForElementTillPageNavigationSettled("CollectionView Header(String)");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1636,14 +1032,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void VerifyFooterTemplateWhenHeaderView()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(HeaderGrid);
-			App.Tap(HeaderGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterTemplateGrid, HeaderGrid);
 			App.WaitForElementTillPageNavigationSettled("HeaderViewLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1656,14 +1045,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 		public void VerifyFooterTemplateWhenHeaderTemplate()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(HeaderTemplateGrid);
-			App.Tap(HeaderTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterTemplateGrid, HeaderTemplateGrid);
 			App.WaitForElementTillPageNavigationSettled("HeaderTemplateLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1676,25 +1058,11 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyFooterTemplateWhenIsGroupedTrueOrFalse()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedTrue);
-			App.Tap(IsGroupedTrue);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterTemplateGrid, IsGroupedTrue);
 			App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(IsGroupedFalse);
-			App.Tap(IsGroupedFalse);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterTemplateGrid, IsGroupedFalse);
 			App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1705,14 +1073,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
 	public void VerifyFooterTemplateWhenBasicDataTemplateView()
 	{
-		App.WaitForElementTillPageNavigationSettled(Options);
-		App.Tap(Options);
-		App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-		App.Tap(FooterTemplateGrid);
-		App.WaitForElementTillPageNavigationSettled(ItemTemplateBasic);
-		App.Tap(ItemTemplateBasic);
-		App.WaitForElementTillPageNavigationSettled(Apply);
-		App.Tap(Apply);
+		ApplyOptions(FooterTemplateGrid, ItemTemplateBasic);
 		App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
 		App.WaitForElementTillPageNavigationSettled("Apple");
 	}
@@ -1722,14 +1083,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyFooterTemplateWithItemsLayoutVerticalGrid()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(ItemsLayoutVerticalGrid);
-			App.Tap(ItemsLayoutVerticalGrid);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterTemplateGrid, ItemsLayoutVerticalGrid);
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.WaitForElementTillPageNavigationSettled("FooterTemplateLabel");
 		}
@@ -1738,14 +1092,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyFooterTemplateWithItemsLayoutHorizontalList()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(ItemsLayoutHorizontalList);
-			App.Tap(ItemsLayoutHorizontalList);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterTemplateGrid, ItemsLayoutHorizontalList);
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.ScrollRight("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
 			App.WaitForElementTillPageNavigationSettled("Mango");
@@ -1756,14 +1103,7 @@ public class CollectionView_HeaderFooterFeatureTests : _GalleryUITest
 		[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 		public void VerifyFooterTemplateWithItemsLayoutHorizontalGrid()
 		{
-			App.WaitForElementTillPageNavigationSettled(Options);
-			App.Tap(Options);
-			App.WaitForElementTillPageNavigationSettled(FooterTemplateGrid);
-			App.Tap(FooterTemplateGrid);
-			App.WaitForElementTillPageNavigationSettled(ItemsLayoutHorizontalGrid);
-			App.Tap(ItemsLayoutHorizontalList);
-			App.WaitForElementTillPageNavigationSettled(Apply);
-			App.Tap(Apply);
+			ApplyOptions(FooterTemplateGrid, ItemsLayoutHorizontalGrid);
 			App.WaitForElementTillPageNavigationSettled("Apple");
 			App.ScrollRight("CollectionViewControl", ScrollStrategy.Gesture, 0.9, 500);
 			App.WaitForElementTillPageNavigationSettled("Mango");

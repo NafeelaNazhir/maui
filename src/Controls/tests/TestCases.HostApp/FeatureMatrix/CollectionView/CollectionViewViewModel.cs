@@ -129,7 +129,16 @@ public class CollectionViewViewModel : INotifyPropertyChanged
 
 		AddItemCommand = new Command(AddItem);
 
-		GroupHeaderTemplate = new DataTemplate(() =>
+		GroupHeaderTemplate = CreateDefaultGroupHeaderTemplate();
+
+		SetItemTemplate();
+		SelectedItems = new ObservableCollection<object>();
+		SelectedItems.CollectionChanged += OnSelectedItemsChanged;
+	}
+
+	private static DataTemplate CreateDefaultGroupHeaderTemplate()
+	{
+		return new DataTemplate(() =>
 		{
 			var stackLayout = new StackLayout
 			{
@@ -144,10 +153,36 @@ public class CollectionViewViewModel : INotifyPropertyChanged
 			stackLayout.Children.Add(label);
 			return stackLayout;
 		});
+	}
+
+	public void ResetHeaderFooterProperties()
+	{
+		_emptyView = null;
+		_emptyViewTemplate = null;
+		_header = null;
+		_footer = null;
+		_headerTemplate = null;
+		_footerTemplate = null;
+		_groupHeaderTemplate = CreateDefaultGroupHeaderTemplate();
+		_groupFooterTemplate = null;
+		_itemsLayout = new LinearItemsLayout(ItemsLayoutOrientation.Vertical);
+		_itemsSourceType = ItemsSourceType.ObservableCollection5T;
+		_isGrouped = false;
 
 		SetItemTemplate();
-		SelectedItems = new ObservableCollection<object>();
-		SelectedItems.CollectionChanged += OnSelectedItemsChanged;
+
+		OnPropertyChanged(nameof(EmptyView));
+		OnPropertyChanged(nameof(EmptyViewTemplate));
+		OnPropertyChanged(nameof(Header));
+		OnPropertyChanged(nameof(Footer));
+		OnPropertyChanged(nameof(HeaderTemplate));
+		OnPropertyChanged(nameof(FooterTemplate));
+		OnPropertyChanged(nameof(GroupHeaderTemplate));
+		OnPropertyChanged(nameof(GroupFooterTemplate));
+		OnPropertyChanged(nameof(ItemsLayout));
+		OnPropertyChanged(nameof(ItemsSourceType));
+		OnPropertyChanged(nameof(IsGrouped));
+		OnPropertyChanged(nameof(ShowAddRemoveButtons));
 	}
 
 	public object EmptyView
