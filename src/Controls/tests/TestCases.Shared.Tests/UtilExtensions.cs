@@ -183,6 +183,12 @@ namespace Microsoft.Maui.TestCases.Tests
 				var y = searchHandler.GetRect().Y + searchHandler.GetRect().Height;
 				app.TapCoordinates(searchHandler.GetRect().X + 10, y + 10);
 			}
+			else if (app is AppiumCatalystApp)
+			{
+				// Native clicks wait for idle and can lose the filtered result before dispatching the click.
+				var rect = app.WaitForElementAndGetRect(searchResultIdentifier);
+				app.TapCoordinates(rect.CenterX(), rect.CenterY());
+			}
 			else
 			{
 				var searchResults = app.FindElements(searchResultIdentifier);
