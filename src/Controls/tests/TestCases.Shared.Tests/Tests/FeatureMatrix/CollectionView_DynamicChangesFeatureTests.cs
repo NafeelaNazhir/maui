@@ -40,11 +40,40 @@ public class CollectionView_DynamicChangesFeatureTests : _GalleryUITest
 	}
 
 	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
+	public void ValidateDynamicItemTemplateCanBeCleared()
+	{
+		ApplyOptions("ItemTemplateBasic", "ItemsSourceNone", "ItemsSourceObservableCollection");
+		App.WaitForElement("DynamicItemTemplateLabel");
+
+		ApplyOptions("ItemTemplateBasic", "ItemTemplateNone", "ItemsSourceNone", "ItemsSourceObservableCollection");
+		App.WaitForElement("Apple");
+		App.WaitForNoElement("DynamicItemTemplateLabel");
+
+		WaitAndTap("ItemTemplateButton");
+		App.WaitForNoElement("Template 1 - Apple");
+	}
+
+	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
 	public void ValidateDynamicHeaderStringDisplayed()
 	{
 		ApplyOptions("HeaderString");
 		VerifyDynamicUpdates("HeaderStringButton", "Default Header String", "Header String1", "Header String2");
+	}
+
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
+	public void ValidateDynamicHeaderStringResetsAfterReopeningOptions()
+	{
+		ApplyOptions("HeaderString");
+		WaitAndTap("HeaderStringButton");
+		App.WaitForElement("Header String1");
+
+		ApplyOptions("HeaderString");
+		WaitAndTap("HeaderStringButton");
+		App.WaitForElement("Header String1");
+		App.WaitForNoElement("Header String2");
 	}
 
 	[Test]
@@ -96,11 +125,42 @@ public class CollectionView_DynamicChangesFeatureTests : _GalleryUITest
 	}
 
 	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 2)]
+	public void ValidateDynamicGroupHeaderTemplateCanBeCleared()
+	{
+		ApplyOptions("ItemsSourceGroupedList", "IsGroupedTrue", "GroupHeaderTemplateGrid");
+		App.WaitForElement("Default GroupHeaderTemplate");
+
+		ApplyOptions("ItemsSourceGroupedList", "IsGroupedTrue", "GroupHeaderTemplateGrid", "GroupHeaderTemplateNone");
+		App.WaitForElement("Apple");
+		App.WaitForNoElement("Default GroupHeaderTemplate");
+		App.WaitForNoElement("GroupHeaderTemplate1");
+
+		WaitAndTap("GroupHeaderTemplateButton");
+		App.WaitForNoElement("GroupHeaderTemplate1");
+	}
+
+	[Test]
 	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
 	public void ValidateDynamicGroupFooterTemplateDisplayed()
 	{
 		ApplyOptions("ItemsSourceGroupedList", "IsGroupedTrue", "GroupFooterTemplateGrid");
 		VerifyDynamicUpdates("GroupFooterTemplateButton", "Default GroupFooterTemplate", "GroupFooterTemplate1", "GroupFooterTemplate2");
+	}
+
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 6)]
+	public void ValidateDynamicGroupFooterTemplateCanBeCleared()
+	{
+		ApplyOptions("ItemsSourceGroupedList", "IsGroupedTrue", "GroupFooterTemplateGrid");
+		App.WaitForElement("Default GroupFooterTemplate");
+
+		ApplyOptions("ItemsSourceGroupedList", "IsGroupedTrue", "GroupFooterTemplateGrid", "GroupFooterTemplateNone");
+		App.WaitForElement("Apple");
+		App.WaitForNoElement("GroupFooterTemplate1");
+
+		WaitAndTap("GroupFooterTemplateButton");
+		App.WaitForNoElement("GroupFooterTemplate1");
 	}
 
 	[Test]
@@ -177,6 +237,22 @@ public class CollectionView_DynamicChangesFeatureTests : _GalleryUITest
 		ApplyOptions("EmptyViewTemplateGrid", "ItemsSourceNone");
 		VerifyDynamicUpdates("EmptyViewTemplateButton", "No Template Items Available(Grid View)",
 			"EmptyViewTemplate1: No items available", "EmptyViewTemplate2: No items available");
+	}
+
+	[Test]
+	[ShardedTestCategory(UITestCategories.CollectionView, shard: 3)]
+	public void ValidateDynamicEmptyViewTemplateCanBeCleared()
+	{
+		ApplyOptions("EmptyViewTemplateGrid", "ItemsSourceNone");
+		App.WaitForElement("No Template Items Available(Grid View)");
+
+		ApplyOptions("EmptyViewTemplateGrid", "EmptyViewTemplateNone", "ItemsSourceNone");
+		App.WaitForElement("EmptyViewTemplateButton");
+		App.WaitForNoElement("No Template Items Available(Grid View)");
+		App.WaitForNoElement("EmptyViewTemplate1: No items available");
+
+		WaitAndTap("EmptyViewTemplateButton");
+		App.WaitForNoElement("EmptyViewTemplate1: No items available");
 	}
 
 	[Test]

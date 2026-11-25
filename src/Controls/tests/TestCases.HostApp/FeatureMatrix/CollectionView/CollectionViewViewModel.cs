@@ -1188,6 +1188,8 @@ public class CollectionViewViewModel : INotifyPropertyChanged
 			Caption = caption;
 			Index = index;
 		}
+
+		public override string ToString() => Caption;
 	}
 
 	public class CollectionViewTestModelItem
